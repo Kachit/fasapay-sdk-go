@@ -1,0 +1,18 @@
+<fasa_response id="1234567" date_time="2013-01-01T10:58:43+07:00">
+    <detail mode="detail" code="210">
+        <batchnumber>TR2012092791234</batchnumber>
+        <date>2012-10-20</date>
+        <time>10:09:36</time>
+        <from>FP00001</from>
+        <to>FP00002</to>
+        <amount>1000.000</amount>
+        <total>1100</total>
+        <currency>IDR</currency>
+        <note>Payment for something</note>
+        <status>FINISH</status>
+        <fee>100.000</fee>
+        <type>Transfer Out</type>
+        <method>api_xml</method>
+        <fee_mod>FiS</fee_mod>
+    </detail>
+</fasa_response>

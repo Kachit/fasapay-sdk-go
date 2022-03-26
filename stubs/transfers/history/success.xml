@@ -1,0 +1,29 @@
+<fasa_response id="1312342474" date_time="2011-08-03T10:34:34+07:00">
+    <history>
+        <page>
+            <total_item>579</total_item>
+            <page_count>58</page_count>
+            <current_page>0</current_page>
+        </page>
+        <detail>
+            <batchnumber>TR2011072685119</batchnumber>
+            <datetime>2011-07-26 15:44:35</datetime>
+            <type>Keluar</type>
+            <to>FP10500</to>
+            <from>FP12049</from>
+            <amount>11160.000</amount>
+            <note>Pembayaran untuk pembelian Liberty Reserve</note>
+            <status>FINISH</status>
+        </detail>
+        <detail>
+            <batchnumber>TR2011072521135</batchnumber>
+            <datetime>2011-07-25 11:38:43</datetime>
+            <type>Keluar</type>
+            <to>FP89680</to>
+            <from>FP12049</from>
+            <amount>1000.000</amount>
+            <note>standart operation</note>
+            <status>FINISH</status>
+        </detail>
+    </history>
+</fasa_response>

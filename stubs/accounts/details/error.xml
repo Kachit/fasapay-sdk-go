@@ -1,0 +1,9 @@
+<fasa_response id="1234567" date_time="2013-01-01T10:58:43+07:00">
+    <errors mode="account" code="41001">
+        <data>
+            <message>ACCOUNT NOT FOUND</message>
+
+            <detail>FP ACCOUNT FP12345 NOT FOUND</detail>
+        </data>
+    </errors>
+</fasa_response>

@@ -1,0 +1,8 @@
+<fasa_response id="1234567" date_time="2013-01-01T10:58:43+07:00">
+    <errors mode="detail" code="40701">
+        <data>
+            <message>TRANSACTION NOT FOUND</message>
+            <detail>BATCHNUMBER TR2012100291308 NOT FOUND</detail>
+        </data>
+    </errors>
+</fasa_response>

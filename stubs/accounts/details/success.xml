@@ -1,0 +1,12 @@
+<fasa_response id="1234567" date_time="2013-01-01T10:58:43+07:00">
+    <account>
+        <fullname>Budiman</fullname>
+        <account>FP00001</account>
+        <status>Store</status>
+    </account>
+    <account>
+        <fullname>Ani Permata</fullname>
+        <account>FP00002</account>
+        <status>Verified</status>
+    </account>
+</fasa_response>

@@ -1,0 +1,6 @@
+<fasa_response id="1234567" date_time="2013-01-01T10:58:43+07:00">
+    <balance>
+        <IDR>19092587.45</IDR>
+        <USD>3987.31</USD>
+    </balance>
+</fasa_response>

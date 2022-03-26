@@ -1,0 +1,8 @@
+<fasa_response id="1234567" date_time="2013-01-01T10:58:43+07:00">
+    <errors mode="balance" code="40901">
+        <data>
+            <message>WRONG OR INACTIVE CURRENCY</message>
+            <detail>WRONG OR INACTIVE CURRENCY CHY</detail>
+        </data>
+    </errors>
+</fasa_response>
