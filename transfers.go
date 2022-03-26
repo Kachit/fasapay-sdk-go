@@ -88,6 +88,31 @@ type GetHistoryResponseDetailParams struct {
 	Fee         float64  `xml:"fee" json:"fee"`
 }
 
+type GetDetailsRequest struct {
+	*RequestParams
+	Details []GetDetailsDetailParamsInterface `xml:"detail" json:"details"`
+}
+
+type GetDetailsDetailParamsInterface interface {
+	GetDetailType() string
+}
+
+type GetDetailsRequestDetailParamsStruct struct {
+	XMLName xml.Name `xml:"detail"`
+	Ref     string   `xml:"ref,omitempty" json:"ref"`
+	Note    string   `xml:"note,omitempty" json:"note"`
+}
+
+func (f *GetDetailsRequestDetailParamsStruct) GetDetailType() string {
+	return "struct"
+}
+
+type GetDetailsRequestDetailParamsString string
+
+func (f *GetDetailsRequestDetailParamsString) GetDetailType() string {
+	return "string"
+}
+
 type GetDetailsResponse struct {
 	*ResponseBody
 	Details []*GetDetailsResponseDetailParams `xml:"detail" json:"details"`

@@ -6,6 +6,22 @@ import (
 	"testing"
 )
 
+func Test_Transfers_GetHistoryRequest_MarshalSuccess(t *testing.T) {
+	xmlRequest := &GetHistoryRequest{RequestParams: BuildStubRequest(), History: &GetHistoryRequestParams{
+		StartDate: "2011-07-01",
+		EndDate:   "2011-07-09",
+		Type:      "transfer",
+		OrderBy:   "date",
+		Order:     "DESC",
+		Page:      uint64(3),
+		PageSize:  uint64(5),
+	}}
+	bytes, err := xml.Marshal(xmlRequest)
+	expected := `<fasa_request id="123456"><auth><api_key>foo</api_key><token>bar</token></auth><history><start_date>2011-07-01</start_date><end_date>2011-07-09</end_date><type>transfer</type><order_by>date</order_by><order>DESC</order><page>3</page><page_size>5</page_size></history></fasa_request>`
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
 func Test_Transfers_GetHistoryResponse_UnmarshalSuccess(t *testing.T) {
 	var response GetHistoryResponse
 	body, _ := LoadStubResponseData("stubs/transfers/history/success.xml")
@@ -36,6 +52,16 @@ func Test_Transfers_GetHistoryResponse_UnmarshalSuccess(t *testing.T) {
 	assert.Equal(t, 1000.000, response.History.Details[1].Amount)
 	assert.Equal(t, "standart operation", response.History.Details[1].Note)
 	assert.Equal(t, "FINISH", response.History.Details[1].Status)
+}
+
+func Test_Transfers_GetDetailsRequest_MarshalSuccess(t *testing.T) {
+	var detailParam1 GetDetailsRequestDetailParamsString = "foo"
+	detailParam2 := &GetDetailsRequestDetailParamsStruct{Ref: "foo"}
+	xmlRequest := &GetDetailsRequest{RequestParams: BuildStubRequest(), Details: []GetDetailsDetailParamsInterface{&detailParam1, detailParam2}}
+	bytes, err := xml.Marshal(xmlRequest)
+	expected := `<fasa_request id="123456"><auth><api_key>foo</api_key><token>bar</token></auth><detail>foo</detail><detail><ref>foo</ref></detail></fasa_request>`
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
 }
 
 func Test_Transfers_GetDetailsResponse_UnmarshalSuccess(t *testing.T) {

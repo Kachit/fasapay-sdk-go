@@ -15,6 +15,11 @@ func BuildStubConfig() *Config {
 	}
 }
 
+func BuildStubRequest() *RequestParams {
+	auth := &RequestAuthParams{ApiKey: "foo", Token: "bar"}
+	return &RequestParams{Auth: auth, Id: "123456"}
+}
+
 func LoadStubResponseData(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
