@@ -7,17 +7,21 @@ import (
 	"strings"
 )
 
+const TestableApiKey = "11123548cd3a5e5613325132112becf"
+const TestableApiSecretWord = "kata rahasia"
+const TestableApiAuthToken = "e910361e42dafdfd100b19701c2ef403858cab640fd699afc67b78c7603ddb1b"
+
 func BuildStubConfig() *Config {
 	return &Config{
 		ApiUri:        SandboxAPIUrl,
-		ApiKey:        "ApiKey",
-		ApiSecretWord: "ApiSecretWord",
+		ApiKey:        TestableApiKey,
+		ApiSecretWord: TestableApiSecretWord,
 	}
 }
 
 func BuildStubRequest() *RequestParams {
-	auth := &RequestAuthParams{ApiKey: "foo", Token: "bar"}
-	return &RequestParams{Auth: auth, Id: "123456"}
+	auth := &RequestAuthParams{ApiKey: TestableApiKey, Token: TestableApiAuthToken}
+	return &RequestParams{Auth: auth, Id: "1234567"}
 }
 
 func LoadStubResponseData(path string) ([]byte, error) {

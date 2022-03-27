@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test_Transfers_GetHistoryRequest_MarshalSuccess(t *testing.T) {
+func Test_Transfers_GetHistoryRequest_MarshalXmlSuccess(t *testing.T) {
 	xmlRequest := &GetHistoryRequest{RequestParams: BuildStubRequest(), History: &GetHistoryRequestParams{
 		StartDate: "2011-07-01",
 		EndDate:   "2011-07-09",
@@ -17,12 +17,12 @@ func Test_Transfers_GetHistoryRequest_MarshalSuccess(t *testing.T) {
 		PageSize:  uint64(5),
 	}}
 	bytes, err := xml.Marshal(xmlRequest)
-	expected := `<fasa_request id="123456"><auth><api_key>foo</api_key><token>bar</token></auth><history><start_date>2011-07-01</start_date><end_date>2011-07-09</end_date><type>transfer</type><order_by>date</order_by><order>DESC</order><page>3</page><page_size>5</page_size></history></fasa_request>`
+	expected := `<fasa_request id="1234567"><auth><api_key>11123548cd3a5e5613325132112becf</api_key><token>e910361e42dafdfd100b19701c2ef403858cab640fd699afc67b78c7603ddb1b</token></auth><history><start_date>2011-07-01</start_date><end_date>2011-07-09</end_date><type>transfer</type><order_by>date</order_by><order>DESC</order><page>3</page><page_size>5</page_size></history></fasa_request>`
 	assert.NoError(t, err)
 	assert.Equal(t, expected, string(bytes))
 }
 
-func Test_Transfers_GetHistoryResponse_UnmarshalSuccess(t *testing.T) {
+func Test_Transfers_GetHistoryResponse_UnmarshalXmlSuccess(t *testing.T) {
 	var response GetHistoryResponse
 	body, _ := LoadStubResponseData("stubs/transfers/history/success.xml")
 	err := xml.Unmarshal(body, &response)
@@ -54,17 +54,17 @@ func Test_Transfers_GetHistoryResponse_UnmarshalSuccess(t *testing.T) {
 	assert.Equal(t, "FINISH", response.History.Details[1].Status)
 }
 
-func Test_Transfers_GetDetailsRequest_MarshalSuccess(t *testing.T) {
+func Test_Transfers_GetDetailsRequest_MarshalXmlSuccess(t *testing.T) {
 	var detailParam1 GetDetailsRequestDetailParamsString = "foo"
 	detailParam2 := &GetDetailsRequestDetailParamsStruct{Ref: "foo"}
 	xmlRequest := &GetDetailsRequest{RequestParams: BuildStubRequest(), Details: []GetDetailsDetailParamsInterface{&detailParam1, detailParam2}}
 	bytes, err := xml.Marshal(xmlRequest)
-	expected := `<fasa_request id="123456"><auth><api_key>foo</api_key><token>bar</token></auth><detail>foo</detail><detail><ref>foo</ref></detail></fasa_request>`
+	expected := `<fasa_request id="1234567"><auth><api_key>11123548cd3a5e5613325132112becf</api_key><token>e910361e42dafdfd100b19701c2ef403858cab640fd699afc67b78c7603ddb1b</token></auth><detail>foo</detail><detail><ref>foo</ref></detail></fasa_request>`
 	assert.NoError(t, err)
 	assert.Equal(t, expected, string(bytes))
 }
 
-func Test_Transfers_GetDetailsResponse_UnmarshalSuccess(t *testing.T) {
+func Test_Transfers_GetDetailsResponse_UnmarshalXmlSuccess(t *testing.T) {
 	var response GetDetailsResponse
 	body, _ := LoadStubResponseData("stubs/transfers/details/success.xml")
 	err := xml.Unmarshal(body, &response)
@@ -91,7 +91,7 @@ func Test_Transfers_GetDetailsResponse_UnmarshalSuccess(t *testing.T) {
 	assert.Equal(t, "api_xml", response.Details[0].Method)
 }
 
-func Test_Transfers_GetDetailsResponse_UnmarshalError(t *testing.T) {
+func Test_Transfers_GetDetailsResponse_UnmarshalXmlError(t *testing.T) {
 	var response GetDetailsResponse
 	body, _ := LoadStubResponseData("stubs/transfers/details/error.xml")
 	err := xml.Unmarshal(body, &response)
@@ -110,7 +110,22 @@ func Test_Transfers_GetDetailsResponse_UnmarshalError(t *testing.T) {
 	assert.Equal(t, "BATCHNUMBER TR2012100291308 NOT FOUND", response.Errors.Data[0].Detail)
 }
 
-func Test_Transfers_CreateTransferResponse_UnmarshalSuccess(t *testing.T) {
+func Test_Transfers_CreateTransferRequest_MarshalXmlSuccess(t *testing.T) {
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		To:       "FP89680",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	xmlRequest := &CreateTransferRequest{RequestParams: BuildStubRequest(), Transfers: []*CreateTransferRequestParams{transfer}}
+	bytes, err := xml.Marshal(xmlRequest)
+	expected := `<fasa_request id="1234567"><auth><api_key>11123548cd3a5e5613325132112becf</api_key><token>e910361e42dafdfd100b19701c2ef403858cab640fd699afc67b78c7603ddb1b</token></auth><transfer id="123"><to>FP89680</to><amount>1000</amount><currency>IDR</currency><note>standart operation</note></transfer></fasa_request>`
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
+func Test_Transfers_CreateTransferResponse_UnmarshalXmlSuccess(t *testing.T) {
 	var response CreateTransferResponse
 	body, _ := LoadStubResponseData("stubs/transfers/transfer/success.xml")
 	err := xml.Unmarshal(body, &response)
@@ -138,7 +153,7 @@ func Test_Transfers_CreateTransferResponse_UnmarshalSuccess(t *testing.T) {
 	assert.Equal(t, "xml_api", response.Transfers[0].Method)
 }
 
-func Test_Transfers_CreateTransferResponse_UnmarshalError(t *testing.T) {
+func Test_Transfers_CreateTransferResponse_UnmarshalXmlError(t *testing.T) {
 	var response CreateTransferResponse
 	body, _ := LoadStubResponseData("stubs/transfers/transfer/error.xml")
 	err := xml.Unmarshal(body, &response)

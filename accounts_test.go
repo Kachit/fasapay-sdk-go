@@ -6,7 +6,15 @@ import (
 	"testing"
 )
 
-func Test_Accounts_GetAccountsResponse_UnmarshalSuccess(t *testing.T) {
+func Test_Accounts_GetAccountsRequest_MarshalXmlSuccess(t *testing.T) {
+	xmlRequest := &GetAccountsRequest{RequestParams: BuildStubRequest(), Accounts: []string{"FP00001", "FP00002"}}
+	bytes, err := xml.Marshal(xmlRequest)
+	expected := `<fasa_request id="1234567"><auth><api_key>11123548cd3a5e5613325132112becf</api_key><token>e910361e42dafdfd100b19701c2ef403858cab640fd699afc67b78c7603ddb1b</token></auth><account>FP00001</account><account>FP00002</account></fasa_request>`
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
+func Test_Accounts_GetAccountsResponse_UnmarshalXmlSuccess(t *testing.T) {
 	var response GetAccountsResponse
 	body, _ := LoadStubResponseData("stubs/accounts/details/success.xml")
 	err := xml.Unmarshal(body, &response)
@@ -24,7 +32,7 @@ func Test_Accounts_GetAccountsResponse_UnmarshalSuccess(t *testing.T) {
 	assert.Equal(t, "Verified", response.Accounts[1].Status)
 }
 
-func Test_Accounts_GetAccountsResponse_UnmarshalError(t *testing.T) {
+func Test_Accounts_GetAccountsResponse_UnmarshalXmlError(t *testing.T) {
 	var response GetAccountsResponse
 	body, _ := LoadStubResponseData("stubs/accounts/details/error.xml")
 	err := xml.Unmarshal(body, &response)
@@ -43,7 +51,15 @@ func Test_Accounts_GetAccountsResponse_UnmarshalError(t *testing.T) {
 	assert.Equal(t, "FP ACCOUNT FP12345 NOT FOUND", response.Errors.Data[0].Detail)
 }
 
-func Test_Accounts_GetBalancesResponse_UnmarshalSuccess(t *testing.T) {
+func Test_Accounts_GetBalancesRequest_MarshalXmlSuccess(t *testing.T) {
+	xmlRequest := &GetBalancesRequest{RequestParams: BuildStubRequest(), Balances: []CurrencyCode{CurrencyCodeIDR, CurrencyCodeUSD}}
+	bytes, err := xml.Marshal(xmlRequest)
+	expected := `<fasa_request id="1234567"><auth><api_key>11123548cd3a5e5613325132112becf</api_key><token>e910361e42dafdfd100b19701c2ef403858cab640fd699afc67b78c7603ddb1b</token></auth><balance>IDR</balance><balance>USD</balance></fasa_request>`
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
+func Test_Accounts_GetBalancesResponse_UnmarshalXmlSuccess(t *testing.T) {
 	var response GetBalancesResponse
 	body, _ := LoadStubResponseData("stubs/accounts/balances/success.xml")
 	err := xml.Unmarshal(body, &response)
@@ -56,7 +72,7 @@ func Test_Accounts_GetBalancesResponse_UnmarshalSuccess(t *testing.T) {
 	assert.Equal(t, 3987.31, response.Balances[0].USD)
 }
 
-func Test_Accounts_GetBalancesResponse_UnmarshalError(t *testing.T) {
+func Test_Accounts_GetBalancesResponse_UnmarshalXmlError(t *testing.T) {
 	var response GetBalancesResponse
 	body, _ := LoadStubResponseData("stubs/accounts/balances/error.xml")
 	err := xml.Unmarshal(body, &response)

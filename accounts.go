@@ -4,7 +4,7 @@ import "encoding/xml"
 
 type GetBalancesRequest struct {
 	*RequestParams
-	Balances []string `xml:"balance" json:"balances"`
+	Balances []CurrencyCode `xml:"balance" json:"balances"`
 }
 
 type GetBalancesResponse struct {

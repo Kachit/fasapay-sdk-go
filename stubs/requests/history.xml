@@ -1,2 +1,0 @@
-<?xml version="1.0"?>
-<fasa_request id="123"><auth><api_key>foo</api_key><token>13423ed8ffb2fc3534e3a13b5a1a18a584025530ce135a4b7ffb2b79b2e74e76</token></auth><history><start_date>2018-01-01</start_date><end_date>2018-02-02</end_date></history></fasa_request>

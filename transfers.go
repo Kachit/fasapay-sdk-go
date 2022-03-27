@@ -4,13 +4,13 @@ import "encoding/xml"
 
 type CreateTransferRequestParams struct {
 	XMLName  xml.Name     `xml:"transfer"`
-	Id       string       `xml:"id,attr" json:"id"`
+	Id       string       `xml:"id,attr,omitempty" json:"id"`
 	To       string       `xml:"to" json:"to"`
 	Amount   float64      `xml:"amount" json:"amount"`
 	Currency CurrencyCode `xml:"currency" json:"currency"`
-	FeeMode  string       `xml:"fee_mode" json:"fee_mode"`
-	Note     string       `xml:"note" json:"note"`
-	Ref      string       `xml:"ref" json:"ref"`
+	FeeMode  string       `xml:"fee_mode,omitempty" json:"fee_mode"`
+	Note     string       `xml:"note,omitempty" json:"note"`
+	Ref      string       `xml:"ref,omitempty" json:"ref"`
 }
 
 type CreateTransferRequest struct {
@@ -44,13 +44,13 @@ type CreateTransferResponseParams struct {
 }
 
 type GetHistoryRequestParams struct {
-	StartDate string `xml:"start_date" json:"start_date"`
-	EndDate   string `xml:"end_date" json:"end_date"`
-	Type      string `xml:"type" json:"type"`
-	OrderBy   string `xml:"order_by" json:"order_by"`
-	Order     string `xml:"order" json:"order"`
-	Page      uint64 `xml:"page" json:"page"`
-	PageSize  uint64 `xml:"page_size" json:"page_size"`
+	StartDate string `xml:"start_date,omitempty" json:"start_date"`
+	EndDate   string `xml:"end_date,omitempty" json:"end_date"`
+	Type      string `xml:"type,omitempty" json:"type"`
+	OrderBy   string `xml:"order_by,omitempty" json:"order_by"`
+	Order     string `xml:"order,omitempty" json:"order"`
+	Page      uint64 `xml:"page,omitempty" json:"page"`
+	PageSize  uint64 `xml:"page_size,omitempty" json:"page_size"`
 }
 
 type GetHistoryRequest struct {
