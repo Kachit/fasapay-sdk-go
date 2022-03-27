@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func Test_Signature_GenerateApiSignature(t *testing.T) {
+func Test_Signature_GenerateApiToken(t *testing.T) {
 	dt := time.Date(2011, time.Month(7), 20, 15, 30, 0, 0, time.UTC)
-	result := generateApiSignature(TestableApiKey, TestableApiSecretWord, dt)
+	result := generateApiToken(TestableApiKey, TestableApiSecretWord, dt)
 	assert.Equal(t, TestableApiAuthToken, result)
 }
