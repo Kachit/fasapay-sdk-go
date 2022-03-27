@@ -2,9 +2,11 @@ package fasapay
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -15,30 +17,35 @@ type RequestBuilder struct {
 	cfg *Config
 }
 
-//BuildAuthParams method
-func (rb *RequestBuilder) buildAuthParams(dt time.Time) *RequestAuthParams {
-	params := &RequestAuthParams{
-		ApiKey: rb.cfg.ApiKey,
-		Token:  generateAuthToken(rb.cfg.ApiKey, rb.cfg.ApiSecretWord, dt),
+//BuildUri method
+func (rb *RequestBuilder) buildUri() (uri *url.URL, err error) {
+	u, err := url.Parse(rb.cfg.Uri)
+	if err != nil {
+		return nil, fmt.Errorf("RequestBuilder.buildUri parse: %v", err)
 	}
-	return params
+	return u, err
 }
 
-//BuildParams method
-func (rb *RequestBuilder) buildParams(id string, dt time.Time) *RequestParams {
-	params := &RequestParams{Id: id, Auth: rb.buildAuthParams(dt)}
-	return params
+//BuildBody method
+func (rb *RequestBuilder) buildBody(body []byte) (io.Reader, error) {
+	return bytes.NewBuffer(body), nil
 }
 
-//BuildQueryParams method
-func (rb *RequestBuilder) buildQueryParams(query map[string]interface{}) string {
-	q := url.Values{}
-	if query != nil {
-		for k, v := range query {
-			q.Set(k, fmt.Sprintf("%v", v))
-		}
+//BuildRequest method
+func (rb *RequestBuilder) buildRequest(ctx context.Context, body []byte) (req *http.Request, err error) {
+	//build body
+	bodyReader, err := rb.buildBody(body)
+	//build uri
+	uri, err := rb.buildUri()
+	if err != nil {
+		return nil, fmt.Errorf("RequestBuilder.buildRequest build uri: %v", err)
 	}
-	return q.Encode()
+	//build request
+	req, err = http.NewRequestWithContext(ctx, "POST", uri.String(), bodyReader)
+	if err != nil {
+		return nil, fmt.Errorf("RequestBuilder.buildRequest new request error: %v", err)
+	}
+	return req, nil
 }
 
 //NewHttpTransport create new http transport
@@ -53,20 +60,17 @@ type Transport struct {
 	rb   *RequestBuilder
 }
 
-//UnmarshalResponse func
-func unmarshalResponse(resp *http.Response, v interface{}) error {
-	defer resp.Body.Close()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+//SendRequest Send request method
+func (tr *Transport) SendRequest(ctx context.Context, body []byte) (resp *http.Response, err error) {
+	req, err := tr.rb.buildRequest(ctx, body)
 	if err != nil {
-		return fmt.Errorf("Response.Unmarshal read body: %v", err)
+		return nil, fmt.Errorf("transport.SendRequest: %v", err)
 	}
-	//reset the response body to the original unread state
-	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-	return xml.Unmarshal(bodyBytes, &v)
+	return tr.http.Do(req)
 }
 
-//CustomRequestParams struct
-type CustomRequestParams struct {
+//RequestParamsAttributes struct
+type RequestParamsAttributes struct {
 	Id       string    `json:"id"`
 	DateTime time.Time `json:"date_time"`
 }

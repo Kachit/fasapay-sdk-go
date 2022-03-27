@@ -1,7 +1,9 @@
 package fasapay
 
 import (
+	"context"
 	"encoding/xml"
+	"fmt"
 	"net/http"
 )
 
@@ -48,10 +50,40 @@ type AccountsResource struct {
 	*ResourceAbstract
 }
 
-func (r *AccountsResource) GetBalances(currencies []CurrencyCode, custom *CustomRequestParams) (*GetBalancesResponse, *http.Response, error) {
-	return nil, nil, nil
+func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Context, attributes *RequestParamsAttributes) (*GetBalancesResponse, *http.Response, error) {
+	baseRequestParams := r.buildRequestParams(attributes)
+	requestParams := &GetBalancesRequest{baseRequestParams, currencies}
+	bytesRequest, err := r.marshalRequestParams(requestParams)
+	if err != nil {
+		return nil, nil, fmt.Errorf("AccountsResource.GetBalances error: %v", err)
+	}
+	rsp, err := r.tr.SendRequest(ctx, bytesRequest)
+	if err != nil {
+		return nil, nil, fmt.Errorf("AccountsResource.GetBalances error: %v", err)
+	}
+	var result GetBalancesResponse
+	err = r.unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("AccountsResource.GetBalances error: %v", err)
+	}
+	return &result, rsp, nil
 }
 
-func (r *AccountsResource) GetAccounts(accounts []string, custom *CustomRequestParams) (*GetAccountsResponse, *http.Response, error) {
-	return nil, nil, nil
+func (r *AccountsResource) GetAccounts(accounts []string, ctx context.Context, attributes *RequestParamsAttributes) (*GetAccountsResponse, *http.Response, error) {
+	baseRequestParams := r.buildRequestParams(attributes)
+	requestParams := &GetAccountsRequest{baseRequestParams, accounts}
+	bytesRequest, err := r.marshalRequestParams(requestParams)
+	if err != nil {
+		return nil, nil, fmt.Errorf("AccountsResource.GetAccounts error: %v", err)
+	}
+	rsp, err := r.tr.SendRequest(ctx, bytesRequest)
+	if err != nil {
+		return nil, nil, fmt.Errorf("AccountsResource.GetAccounts error: %v", err)
+	}
+	var result GetAccountsResponse
+	err = r.unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("AccountsResource.GetAccounts error: %v", err)
+	}
+	return &result, rsp, nil
 }

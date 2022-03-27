@@ -1,7 +1,9 @@
 package fasapay
 
 import (
+	"context"
 	"encoding/xml"
+	"fmt"
 	"net/http"
 )
 
@@ -163,14 +165,23 @@ type TransfersResource struct {
 	*ResourceAbstract
 }
 
-func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestParams, custom *CustomRequestParams) (*CreateTransferResponse, *http.Response, error) {
+func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestParams, ctx context.Context, attributes *RequestParamsAttributes) (*CreateTransferResponse, *http.Response, error) {
+	baseRequestParams := r.buildRequestParams(attributes)
+	requestParams := &CreateTransferRequest{baseRequestParams, transfers}
+	fmt.Println(requestParams)
 	return nil, nil, nil
 }
 
-func (r *TransfersResource) GetHistory(history *GetHistoryResponseHistoryParams, custom *CustomRequestParams) (*GetHistoryResponse, *http.Response, error) {
+func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx context.Context, attributes *RequestParamsAttributes) (*GetHistoryResponse, *http.Response, error) {
+	baseRequestParams := r.buildRequestParams(attributes)
+	requestParams := &GetHistoryRequest{baseRequestParams, history}
+	fmt.Println(requestParams)
 	return nil, nil, nil
 }
 
-func (r *TransfersResource) GetDetails(details []GetDetailsDetailParamsInterface, custom *CustomRequestParams) (*GetDetailsResponse, *http.Response, error) {
+func (r *TransfersResource) GetDetails(details []GetDetailsDetailParamsInterface, ctx context.Context, attributes *RequestParamsAttributes) (*GetDetailsResponse, *http.Response, error) {
+	baseRequestParams := r.buildRequestParams(attributes)
+	requestParams := &GetDetailsRequest{baseRequestParams, details}
+	fmt.Println(requestParams)
 	return nil, nil, nil
 }
