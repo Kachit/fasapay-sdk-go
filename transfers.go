@@ -26,7 +26,7 @@ type CreateTransferRequest struct {
 //CreateTransferResponse struct
 type CreateTransferResponse struct {
 	*ResponseBody
-	Transfers []*CreateTransferResponseParams `xml:"transfer" json:"transfers"`
+	Transfers []*CreateTransferResponseParams `xml:"transfer,omitempty" json:"transfers,omitempty"`
 }
 
 //CreateTransferResponseParams struct
@@ -76,7 +76,7 @@ type GetHistoryResponse struct {
 //GetHistoryResponseHistoryParams struct
 type GetHistoryResponseHistoryParams struct {
 	Page    *GetHistoryResponsePageParams     `xml:"page" json:"page"`
-	Details []*GetHistoryResponseDetailParams `xml:"detail" json:"details"`
+	Details []*GetHistoryResponseDetailParams `xml:"detail,omitempty" json:"details,omitempty"`
 }
 
 //GetHistoryResponsePageParams struct
@@ -88,7 +88,7 @@ type GetHistoryResponsePageParams struct {
 
 //GetHistoryResponseDetailParams struct
 type GetHistoryResponseDetailParams struct {
-	XMLName     xml.Name `xml:"detail"`
+	XMLName     xml.Name `xml:"detail" json:"-"`
 	BatchNumber string   `xml:"batchnumber" json:"batchnumber"`
 	Datetime    string   `xml:"datetime" json:"datetime"`
 	Type        string   `xml:"type" json:"type"`
@@ -114,9 +114,9 @@ type GetDetailsDetailParamsInterface interface {
 
 //GetDetailsRequestDetailParamsStruct struct
 type GetDetailsRequestDetailParamsStruct struct {
-	XMLName xml.Name `xml:"detail"`
-	Ref     string   `xml:"ref,omitempty" json:"ref"`
-	Note    string   `xml:"note,omitempty" json:"note"`
+	XMLName xml.Name `xml:"detail" json:"-"`
+	Ref     string   `xml:"ref,omitempty" json:"ref,omitempty"`
+	Note    string   `xml:"note,omitempty" json:"note,omitempty"`
 }
 
 //GetDetailType method implementation
@@ -135,12 +135,12 @@ func (f *GetDetailsRequestDetailParamsString) GetDetailType() string {
 //GetDetailsResponse struct
 type GetDetailsResponse struct {
 	*ResponseBody
-	Details []*GetDetailsResponseDetailParams `xml:"detail" json:"details"`
+	Details []*GetDetailsResponseDetailParams `xml:"detail,omitempty" json:"details,omitempty"`
 }
 
 //GetDetailsResponseDetailParams struct
 type GetDetailsResponseDetailParams struct {
-	XMLName     xml.Name `xml:"detail"`
+	XMLName     xml.Name `xml:"detail" json:"-"`
 	Mode        string   `xml:"mode,attr" json:"mode"`
 	Code        uint64   `xml:"code,attr" json:"code"`
 	BatchNumber string   `xml:"batchnumber" json:"batchnumber"`

@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-//generateApiToken method
-func generateApiToken(apiKey string, apiSecret string, dt time.Time) string {
+//GenerateAuthToken method
+func generateAuthToken(apiKey string, apiSecret string, dt time.Time) string {
 	h := sha256.New()
 	str := apiKey + ":" + apiSecret + ":" + dt.Format("2006010215")
 	h.Write([]byte(str))

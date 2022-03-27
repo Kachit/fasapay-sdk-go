@@ -1,6 +1,7 @@
 package fasapay
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -52,6 +53,18 @@ func Test_Transfers_GetHistoryResponse_UnmarshalXmlSuccess(t *testing.T) {
 	assert.Equal(t, 1000.000, response.History.Details[1].Amount)
 	assert.Equal(t, "standart operation", response.History.Details[1].Note)
 	assert.Equal(t, "FINISH", response.History.Details[1].Status)
+}
+
+func Test_Transfers_GetHistoryResponse_MarshalJsonSuccess(t *testing.T) {
+	var response GetHistoryResponse
+	body, _ := LoadStubResponseData("stubs/transfers/history/success.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1312342474","date_time":"2011-08-03T10:34:34+07:00","history":{"page":{"total_item":579,"page_count":58,"current_page":0},"details":[{"batchnumber":"TR2011072685119","datetime":"2011-07-26 15:44:35","type":"Keluar","to":"FP10500","from":"FP12049","amount":11160,"note":"Pembayaran untuk pembelian Liberty Reserve","status":"FINISH","currency":"","fee":0},{"batchnumber":"TR2011072521135","datetime":"2011-07-25 11:38:43","type":"Keluar","to":"FP89680","from":"FP12049","amount":1000,"note":"standart operation","status":"FINISH","currency":"","fee":0}]}}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
 }
 
 func Test_Transfers_GetDetailsRequest_MarshalXmlSuccess(t *testing.T) {
@@ -108,6 +121,30 @@ func Test_Transfers_GetDetailsResponse_UnmarshalXmlError(t *testing.T) {
 	assert.Equal(t, "", response.Errors.Data[0].Attribute)
 	assert.Equal(t, "TRANSACTION NOT FOUND", response.Errors.Data[0].Message)
 	assert.Equal(t, "BATCHNUMBER TR2012100291308 NOT FOUND", response.Errors.Data[0].Detail)
+}
+
+func Test_Transfers_GetDetailsResponse_MarshalJsonSuccess(t *testing.T) {
+	var response GetDetailsResponse
+	body, _ := LoadStubResponseData("stubs/transfers/details/success.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1234567","date_time":"2013-01-01T10:58:43+07:00","details":[{"mode":"detail","code":210,"batchnumber":"TR2012092791234","date":"2012-10-20","time":"10:09:36","from":"FP00001","to":"FP00002","amount":1000,"total":1100,"currency":"IDR","note":"Payment for something","status":"FINISH","fee":100,"type":"Transfer Out","method":"api_xml","fee_mod":"FiS"}]}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
+func Test_Transfers_GetDetailsResponse_MarshalJsonError(t *testing.T) {
+	var response GetDetailsResponse
+	body, _ := LoadStubResponseData("stubs/transfers/details/error.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1234567","date_time":"2013-01-01T10:58:43+07:00","errors":{"mode":"detail","code":40701,"data":[{"message":"TRANSACTION NOT FOUND","detail":"BATCHNUMBER TR2012100291308 NOT FOUND"}]}}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
 }
 
 func Test_Transfers_CreateTransferRequest_MarshalXmlSuccess(t *testing.T) {
@@ -180,4 +217,28 @@ func Test_Transfers_CreateTransferResponse_UnmarshalXmlError(t *testing.T) {
 	assert.Equal(t, "jumlah", response.Errors.Data[2].Attribute)
 	assert.Equal(t, "Jumlah melebihi batas yg diijinkan.", response.Errors.Data[2].Message)
 	assert.Equal(t, "", response.Errors.Data[2].Detail)
+}
+
+func Test_Transfers_CreateTransferResponse_MarshalJsonSuccess(t *testing.T) {
+	var response CreateTransferResponse
+	body, _ := LoadStubResponseData("stubs/transfers/transfer/success.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1311059195","date_time":"2011-07-19T14:06:35+07:00","transfers":[{"mode":"transfer","code":203,"batchnumber":"TR2011071917277","date":"2011-07-19","time":"14:06:35","from":"FP12049","to":"FP89680","fee":100,"amount":1000,"total":1100,"fee_mode":"FiS","currency":"IDR","note":"standart operation","status":"FINISH","type":"Keluar","balance":2815832,"method":"xml_api"}]}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
+func Test_Transfers_CreateTransferResponse_MarshalJsonError(t *testing.T) {
+	var response CreateTransferResponse
+	body, _ := LoadStubResponseData("stubs/transfers/transfer/error.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1311059195","date_time":"2011-07-19T14:06:35+07:00","errors":{"id":"tid3","mode":"transfer","code":40600,"data":[{"code":40605,"attribute":"id_kurensi","message":"Kurensi tidak boleh kosong."},{"code":40601,"attribute":"to","message":"Tidak ada User dengan Nomor Akun FP89681"},{"code":40602,"attribute":"jumlah","message":"Jumlah melebihi batas yg diijinkan."}]}}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
 }

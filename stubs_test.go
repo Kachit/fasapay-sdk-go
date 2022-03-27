@@ -13,7 +13,7 @@ const TestableApiAuthToken = "e910361e42dafdfd100b19701c2ef403858cab640fd699afc6
 
 func BuildStubConfig() *Config {
 	return &Config{
-		ApiUri:        SandboxAPIUrl,
+		Uri:           SandboxAPIUrl,
 		ApiKey:        TestableApiKey,
 		ApiSecretWord: TestableApiSecretWord,
 	}

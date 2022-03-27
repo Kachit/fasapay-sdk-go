@@ -1,6 +1,7 @@
 package fasapay
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -51,6 +52,30 @@ func Test_Accounts_GetAccountsResponse_UnmarshalXmlError(t *testing.T) {
 	assert.Equal(t, "FP ACCOUNT FP12345 NOT FOUND", response.Errors.Data[0].Detail)
 }
 
+func Test_Accounts_GetAccountsResponse_MarshalJsonSuccess(t *testing.T) {
+	var response GetAccountsResponse
+	body, _ := LoadStubResponseData("stubs/accounts/details/success.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1234567","date_time":"2013-01-01T10:58:43+07:00","accounts":[{"fullname":"Budiman","account":"FP00001","status":"Store"},{"fullname":"Ani Permata","account":"FP00002","status":"Verified"}]}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
+func Test_Accounts_GetAccountsResponse_MarshalJsonError(t *testing.T) {
+	var response GetAccountsResponse
+	body, _ := LoadStubResponseData("stubs/accounts/details/error.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1234567","date_time":"2013-01-01T10:58:43+07:00","errors":{"mode":"account","code":41001,"data":[{"message":"ACCOUNT NOT FOUND","detail":"FP ACCOUNT FP12345 NOT FOUND"}]}}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
 func Test_Accounts_GetBalancesRequest_MarshalXmlSuccess(t *testing.T) {
 	xmlRequest := &GetBalancesRequest{RequestParams: BuildStubRequest(), Balances: []CurrencyCode{CurrencyCodeIDR, CurrencyCodeUSD}}
 	bytes, err := xml.Marshal(xmlRequest)
@@ -89,4 +114,28 @@ func Test_Accounts_GetBalancesResponse_UnmarshalXmlError(t *testing.T) {
 	assert.Equal(t, "", response.Errors.Data[0].Attribute)
 	assert.Equal(t, "WRONG OR INACTIVE CURRENCY", response.Errors.Data[0].Message)
 	assert.Equal(t, "WRONG OR INACTIVE CURRENCY CHY", response.Errors.Data[0].Detail)
+}
+
+func Test_Accounts_GetBalancesResponse_MarshalJsonSuccess(t *testing.T) {
+	var response GetBalancesResponse
+	body, _ := LoadStubResponseData("stubs/accounts/balances/success.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1234567","date_time":"2013-01-01T10:58:43+07:00","balances":[{"IDR":19092587.45,"USD":3987.31}]}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
+}
+
+func Test_Accounts_GetBalancesResponse_MarshalJsonError(t *testing.T) {
+	var response GetBalancesResponse
+	body, _ := LoadStubResponseData("stubs/accounts/balances/error.xml")
+	err := xml.Unmarshal(body, &response)
+
+	assert.NoError(t, err)
+	expected := `{"id":"1234567","date_time":"2013-01-01T10:58:43+07:00","errors":{"mode":"balance","code":40901,"data":[{"message":"WRONG OR INACTIVE CURRENCY","detail":"WRONG OR INACTIVE CURRENCY CHY"}]}}`
+	bytes, err := json.Marshal(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, string(bytes))
 }
