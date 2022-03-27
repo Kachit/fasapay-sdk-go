@@ -9,9 +9,6 @@ const CurrencyCodeUSD CurrencyCode = "USD"
 //CurrencyCodeUSD type
 const CurrencyCodeIDR CurrencyCode = "IDR"
 
-//CurrencyCodeJPY type
-const CurrencyCodeJPY CurrencyCode = "JPY"
-
 //TransactionFeeMode type
 type TransactionFeeMode string
 

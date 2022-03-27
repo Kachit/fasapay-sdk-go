@@ -45,6 +45,7 @@ type GetAccountsResponseParams struct {
 }
 
 type AccountsResource struct {
+	*ResourceAbstract
 }
 
 func (r *AccountsResource) GetBalances(currencies []CurrencyCode, custom *CustomRequestParams) (*GetBalancesResponse, *http.Response, error) {

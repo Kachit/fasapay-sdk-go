@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const TestableApiKey = "11123548cd3a5e5613325132112becf"
@@ -17,6 +18,10 @@ func BuildStubConfig() *Config {
 		ApiKey:        TestableApiKey,
 		ApiSecretWord: TestableApiSecretWord,
 	}
+}
+
+func BuildStubDateTime() time.Time {
+	return time.Date(2011, time.Month(7), 20, 15, 30, 0, 0, time.UTC)
 }
 
 func BuildStubRequest() *RequestParams {

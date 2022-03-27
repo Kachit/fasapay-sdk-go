@@ -160,6 +160,7 @@ type GetDetailsResponseDetailParams struct {
 }
 
 type TransfersResource struct {
+	*ResourceAbstract
 }
 
 func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestParams, custom *CustomRequestParams) (*CreateTransferResponse, *http.Response, error) {

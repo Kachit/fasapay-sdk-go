@@ -21,6 +21,7 @@ func Test_Accounts_GetAccountsResponse_UnmarshalXmlSuccess(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.True(t, response.IsSuccess())
 	assert.Equal(t, "1234567", response.Id)
 	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
 	//accounts
@@ -39,6 +40,7 @@ func Test_Accounts_GetAccountsResponse_UnmarshalXmlError(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.False(t, response.IsSuccess())
 	assert.Equal(t, "1234567", response.Id)
 	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
 	//errors
@@ -90,6 +92,7 @@ func Test_Accounts_GetBalancesResponse_UnmarshalXmlSuccess(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.True(t, response.IsSuccess())
 	assert.Equal(t, "1234567", response.Id)
 	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
 	//accounts
@@ -103,6 +106,7 @@ func Test_Accounts_GetBalancesResponse_UnmarshalXmlError(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.False(t, response.IsSuccess())
 	assert.Equal(t, "1234567", response.Id)
 	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
 	//errors

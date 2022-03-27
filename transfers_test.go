@@ -29,6 +29,7 @@ func Test_Transfers_GetHistoryResponse_UnmarshalXmlSuccess(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.True(t, response.IsSuccess())
 	assert.Equal(t, "1312342474", response.Id)
 	assert.Equal(t, "2011-08-03T10:34:34+07:00", response.DateTime)
 	//pagination
@@ -83,6 +84,7 @@ func Test_Transfers_GetDetailsResponse_UnmarshalXmlSuccess(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.True(t, response.IsSuccess())
 	assert.Equal(t, "1234567", response.Id)
 	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
 	//detail
@@ -110,6 +112,7 @@ func Test_Transfers_GetDetailsResponse_UnmarshalXmlError(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.False(t, response.IsSuccess())
 	assert.Equal(t, "1234567", response.Id)
 	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
 	//errors
@@ -168,6 +171,7 @@ func Test_Transfers_CreateTransferResponse_UnmarshalXmlSuccess(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.True(t, response.IsSuccess())
 	assert.Equal(t, "1311059195", response.Id)
 	assert.Equal(t, "2011-07-19T14:06:35+07:00", response.DateTime)
 	//transfer
@@ -196,6 +200,7 @@ func Test_Transfers_CreateTransferResponse_UnmarshalXmlError(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 	assert.NoError(t, err)
 	//common
+	assert.False(t, response.IsSuccess())
 	assert.Equal(t, "1311059195", response.Id)
 	assert.Equal(t, "2011-07-19T14:06:35+07:00", response.DateTime)
 	//errors

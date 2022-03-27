@@ -11,7 +11,7 @@ type Config struct {
 
 //IsSandbox check is sandbox environment
 func (c *Config) IsSandbox() bool {
-	return c.Uri != ProdAPIUrl
+	return c.Uri != ProdAPIUrl && c.Uri != ProdAPIUrlSecond
 }
 
 //IsValid check is valid config parameters
@@ -25,4 +25,24 @@ func (c *Config) IsValid() error {
 		err = fmt.Errorf(`parameter "api_secret_word" is empty`)
 	}
 	return err
+}
+
+//NewConfig Create new config from credentials (Prod version)
+func NewConfig(apiKey string, apiSecretWord string) *Config {
+	cfg := &Config{
+		Uri:           ProdAPIUrl,
+		ApiKey:        apiKey,
+		ApiSecretWord: apiSecretWord,
+	}
+	return cfg
+}
+
+//NewConfigSandbox Create new config from credentials (Sandbox version)
+func NewConfigSandbox(apiKey string, apiSecretWord string) *Config {
+	cfg := &Config{
+		Uri:           SandboxAPIUrl,
+		ApiKey:        apiKey,
+		ApiSecretWord: apiSecretWord,
+	}
+	return cfg
 }

@@ -41,6 +41,18 @@ func (rb *RequestBuilder) buildQueryParams(query map[string]interface{}) string 
 	return q.Encode()
 }
 
+//NewHttpTransport create new http transport
+func NewHttpTransport(config *Config, h *http.Client) *Transport {
+	rb := &RequestBuilder{cfg: config}
+	return &Transport{http: h, rb: rb}
+}
+
+//Transport wrapper
+type Transport struct {
+	http *http.Client
+	rb   *RequestBuilder
+}
+
 //UnmarshalResponse func
 func unmarshalResponse(resp *http.Response, v interface{}) error {
 	defer resp.Body.Close()
@@ -79,6 +91,11 @@ type ResponseBody struct {
 	Id       string              `xml:"id,attr" json:"id"`
 	DateTime string              `xml:"date_time,attr" json:"date_time"`
 	Errors   *ResponseBodyErrors `xml:"errors,omitempty" json:"errors,omitempty"`
+}
+
+//IsSuccess method
+func (r *ResponseBody) IsSuccess() bool {
+	return r.Errors == nil
 }
 
 //ResponseBodyErrors struct
