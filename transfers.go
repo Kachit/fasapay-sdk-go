@@ -168,20 +168,56 @@ type TransfersResource struct {
 func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestParams, ctx context.Context, attributes *RequestParamsAttributes) (*CreateTransferResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &CreateTransferRequest{baseRequestParams, transfers}
-	fmt.Println(requestParams)
-	return nil, nil, nil
+	bytesRequest, err := r.marshalRequestParams(requestParams)
+	if err != nil {
+		return nil, nil, fmt.Errorf("TransfersResource.CreateTransfer error: %v", err)
+	}
+	rsp, err := r.tr.SendRequest(ctx, bytesRequest)
+	if err != nil {
+		return nil, nil, fmt.Errorf("TransfersResource.CreateTransfer error: %v", err)
+	}
+	var result CreateTransferResponse
+	err = r.unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("TransfersResource.CreateTransfer error: %v", err)
+	}
+	return &result, rsp, nil
 }
 
 func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx context.Context, attributes *RequestParamsAttributes) (*GetHistoryResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetHistoryRequest{baseRequestParams, history}
-	fmt.Println(requestParams)
-	return nil, nil, nil
+	bytesRequest, err := r.marshalRequestParams(requestParams)
+	if err != nil {
+		return nil, nil, fmt.Errorf("TransfersResource.GetHistory error: %v", err)
+	}
+	rsp, err := r.tr.SendRequest(ctx, bytesRequest)
+	if err != nil {
+		return nil, nil, fmt.Errorf("TransfersResource.GetHistory error: %v", err)
+	}
+	var result GetHistoryResponse
+	err = r.unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("TransfersResource.GetHistory error: %v", err)
+	}
+	return &result, rsp, nil
 }
 
 func (r *TransfersResource) GetDetails(details []GetDetailsDetailParamsInterface, ctx context.Context, attributes *RequestParamsAttributes) (*GetDetailsResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetDetailsRequest{baseRequestParams, details}
-	fmt.Println(requestParams)
-	return nil, nil, nil
+	bytesRequest, err := r.marshalRequestParams(requestParams)
+	if err != nil {
+		return nil, nil, fmt.Errorf("TransfersResource.GetDetails error: %v", err)
+	}
+	rsp, err := r.tr.SendRequest(ctx, bytesRequest)
+	if err != nil {
+		return nil, nil, fmt.Errorf("TransfersResource.GetDetails error: %v", err)
+	}
+	var result GetDetailsResponse
+	err = r.unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("TransfersResource.GetDetails error: %v", err)
+	}
+	return &result, rsp, nil
 }

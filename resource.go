@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -41,8 +40,9 @@ func (rb *ResourceAbstract) marshalRequestParams(request interface{}) ([]byte, e
 	if err != nil {
 		return nil, err
 	}
-	req := "req=" + url.QueryEscape(string(bts))
-	return []byte(req), nil
+	req := []byte("req=")
+	req = append(req, bts...)
+	return req, nil
 }
 
 //UnmarshalResponse func

@@ -30,6 +30,13 @@ func (rb *RequestBuilder) buildBody(body []byte) (io.Reader, error) {
 	return bytes.NewBuffer(body), nil
 }
 
+//BuildHeaders method
+func (rb *RequestBuilder) buildHeaders() http.Header {
+	headers := http.Header{}
+	headers.Set("Content-Type", "application/x-www-form-urlencoded")
+	return headers
+}
+
 //BuildRequest method
 func (rb *RequestBuilder) buildRequest(ctx context.Context, body []byte) (req *http.Request, err error) {
 	//build body
@@ -44,6 +51,8 @@ func (rb *RequestBuilder) buildRequest(ctx context.Context, body []byte) (req *h
 	if err != nil {
 		return nil, fmt.Errorf("RequestBuilder.buildRequest new request error: %v", err)
 	}
+	//build headers
+	req.Header = rb.buildHeaders()
 	return req, nil
 }
 
