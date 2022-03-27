@@ -29,7 +29,7 @@ func (rb *ResourceAbstract) buildAuthRequestParams(dt time.Time) *RequestAuthPar
 func (rb *ResourceAbstract) buildRequestParams(attributes *RequestParamsAttributes) *RequestParams {
 	if attributes == nil {
 		dt := time.Now().UTC()
-		attributes = &RequestParamsAttributes{Id: string(dt.Unix()), DateTime: dt}
+		attributes = &RequestParamsAttributes{Id: fmt.Sprint(dt.Unix()), DateTime: dt}
 	}
 	params := &RequestParams{Id: attributes.Id, Auth: rb.buildAuthRequestParams(attributes.DateTime)}
 	return params
