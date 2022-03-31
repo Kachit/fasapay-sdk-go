@@ -16,14 +16,13 @@ type GetBalancesRequest struct {
 //GetBalancesResponse struct
 type GetBalancesResponse struct {
 	*ResponseBody
-	Balances []*GetBalancesResponseParams `xml:"balance,omitempty" json:"balances,omitempty"`
+	Balances *GetBalancesResponseParams `xml:"balance,omitempty" json:"balances,omitempty"`
 }
 
 //GetBalancesResponseParams struct
 type GetBalancesResponseParams struct {
-	XMLName xml.Name `xml:"balance" json:"-"`
-	IDR     float64  `xml:"IDR" json:"IDR"`
-	USD     float64  `xml:"USD" json:"USD"`
+	IDR float64 `xml:"IDR" json:"IDR"`
+	USD float64 `xml:"USD" json:"USD"`
 }
 
 //GetAccountsRequest struct

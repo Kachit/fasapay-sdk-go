@@ -20,6 +20,10 @@ func BuildStubConfig() *Config {
 	}
 }
 
+func BuildStubHttpTransport() *Transport {
+	return NewHttpTransport(BuildStubConfig(), &http.Client{})
+}
+
 func BuildStubDateTime() time.Time {
 	return time.Date(2011, time.Month(7), 20, 15, 30, 0, 0, time.UTC)
 }

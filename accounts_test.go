@@ -1,9 +1,13 @@
 package fasapay
 
 import (
+	"context"
 	"encoding/json"
 	"encoding/xml"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
 	"testing"
 )
 
@@ -15,43 +19,77 @@ func Test_Accounts_GetAccountsRequest_MarshalXmlSuccess(t *testing.T) {
 	assert.Equal(t, expected, string(bytes))
 }
 
-func Test_Accounts_GetAccountsResponse_UnmarshalXmlSuccess(t *testing.T) {
-	var response GetAccountsResponse
-	body, _ := LoadStubResponseData("stubs/accounts/details/success.xml")
-	err := xml.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	//common
-	assert.True(t, response.IsSuccess())
-	assert.Equal(t, "1234567", response.Id)
-	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
-	//accounts
-	assert.Equal(t, "Budiman", response.Accounts[0].FullName)
-	assert.Equal(t, "FP00001", response.Accounts[0].Account)
-	assert.Equal(t, "Store", response.Accounts[0].Status)
+func Test_Accounts_AccountsResource_GetAccountsSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
-	assert.Equal(t, "Ani Permata", response.Accounts[1].FullName)
-	assert.Equal(t, "FP00002", response.Accounts[1].Account)
-	assert.Equal(t, "Verified", response.Accounts[1].Status)
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &AccountsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+
+	body, _ := LoadStubResponseData("stubs/accounts/details/success.xml")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	accounts := []string{"FP0000001"}
+	result, resp, err := resource.GetAccounts(accounts, ctx, nil)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//common
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, "1234567", result.Id)
+	assert.Equal(t, "2013-01-01T10:58:43+07:00", result.DateTime)
+	//accounts
+	assert.Equal(t, "Budiman", result.Accounts[0].FullName)
+	assert.Equal(t, "FP00001", result.Accounts[0].Account)
+	assert.Equal(t, "Store", result.Accounts[0].Status)
+
+	assert.Equal(t, "Ani Permata", result.Accounts[1].FullName)
+	assert.Equal(t, "FP00002", result.Accounts[1].Account)
+	assert.Equal(t, "Verified", result.Accounts[1].Status)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Accounts_GetAccountsResponse_UnmarshalXmlError(t *testing.T) {
-	var response GetAccountsResponse
-	body, _ := LoadStubResponseData("stubs/accounts/details/error.xml")
-	err := xml.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	//common
-	assert.False(t, response.IsSuccess())
-	assert.Equal(t, "1234567", response.Id)
-	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
-	//errors
-	assert.Equal(t, uint64(41001), response.Errors.Code)
-	assert.Equal(t, "account", response.Errors.Mode)
-	assert.Equal(t, "", response.Errors.Id)
+func Test_Accounts_AccountsResource_GetAccountsError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
-	assert.Equal(t, uint64(0), response.Errors.Data[0].Code)
-	assert.Equal(t, "", response.Errors.Data[0].Attribute)
-	assert.Equal(t, "ACCOUNT NOT FOUND", response.Errors.Data[0].Message)
-	assert.Equal(t, "FP ACCOUNT FP12345 NOT FOUND", response.Errors.Data[0].Detail)
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &AccountsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+
+	body, _ := LoadStubResponseData("stubs/accounts/details/error.xml")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	accounts := []string{"FP0000001"}
+	result, resp, err := resource.GetAccounts(accounts, ctx, nil)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//common
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, "1234567", result.Id)
+	assert.Equal(t, "2013-01-01T10:58:43+07:00", result.DateTime)
+	//errors
+	assert.Equal(t, uint64(41001), result.Errors.Code)
+	assert.Equal(t, "account", result.Errors.Mode)
+	assert.Equal(t, "", result.Errors.Id)
+
+	assert.Equal(t, uint64(0), result.Errors.Data[0].Code)
+	assert.Equal(t, "", result.Errors.Data[0].Attribute)
+	assert.Equal(t, "ACCOUNT NOT FOUND", result.Errors.Data[0].Message)
+	assert.Equal(t, "FP ACCOUNT FP12345 NOT FOUND", result.Errors.Data[0].Detail)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
 func Test_Accounts_GetAccountsResponse_MarshalJsonSuccess(t *testing.T) {
@@ -96,8 +134,8 @@ func Test_Accounts_GetBalancesResponse_UnmarshalXmlSuccess(t *testing.T) {
 	assert.Equal(t, "1234567", response.Id)
 	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
 	//accounts
-	assert.Equal(t, 19092587.45, response.Balances[0].IDR)
-	assert.Equal(t, 3987.31, response.Balances[0].USD)
+	assert.Equal(t, 19092587.45, response.Balances.IDR)
+	assert.Equal(t, 3987.31, response.Balances.USD)
 }
 
 func Test_Accounts_GetBalancesResponse_UnmarshalXmlError(t *testing.T) {
@@ -126,7 +164,7 @@ func Test_Accounts_GetBalancesResponse_MarshalJsonSuccess(t *testing.T) {
 	err := xml.Unmarshal(body, &response)
 
 	assert.NoError(t, err)
-	expected := `{"id":"1234567","date_time":"2013-01-01T10:58:43+07:00","balances":[{"IDR":19092587.45,"USD":3987.31}]}`
+	expected := `{"id":"1234567","date_time":"2013-01-01T10:58:43+07:00","balances":{"IDR":19092587.45,"USD":3987.31}}`
 	bytes, err := json.Marshal(&response)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, string(bytes))
