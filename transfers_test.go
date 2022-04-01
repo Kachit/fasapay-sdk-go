@@ -76,6 +76,69 @@ func Test_Transfers_TransfersResource_GetHistorySuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
+func Test_Transfers_TransfersResource_GetHistoryXmlError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	body, _ := LoadStubResponseData("stubs/transfers/history/error.xml")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	historyFilter := &GetHistoryRequestParams{StartDate: "2022-03-01", EndDate: "2022-03-28"}
+	result, resp, err := resource.GetHistory(historyFilter, ctx, nil)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//common
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, "1312342474", result.Id)
+	assert.Equal(t, "2011-08-03T10:34:34+07:00", result.DateTime)
+	//errors
+	assert.Equal(t, uint64(40701), result.Errors.Code)
+	assert.Equal(t, "history", result.Errors.Mode)
+	assert.Equal(t, "", result.Errors.Id)
+
+	assert.Equal(t, uint64(0), result.Errors.Data[0].Code)
+	assert.Equal(t, "", result.Errors.Data[0].Attribute)
+	assert.Equal(t, "INVALID DATE FORMAT (yyyy-mm-dd)", result.Errors.Data[0].Message)
+	assert.Equal(t, "INVALID DATE FORMAT (yyyy-mm-dd) foo", result.Errors.Data[0].Detail)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "UNEXPECTED ERROR", err.Error())
+}
+
+func Test_Transfers_TransfersResource_GetHistoryNonXmlError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	historyFilter := &GetHistoryRequestParams{StartDate: "2022-03-01", EndDate: "2022-03-28"}
+	result, resp, err := resource.GetHistory(historyFilter, ctx, nil)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "TransfersResource.GetHistory error: EOF", err.Error())
+}
+
 func Test_Transfers_GetHistoryResponse_MarshalJsonSuccess(t *testing.T) {
 	var response GetHistoryResponse
 	body, _ := LoadStubResponseData("stubs/transfers/history/success.xml")
@@ -145,7 +208,7 @@ func Test_Transfers_TransfersResource_GetDetailsSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Transfers_TransfersResource_GetDetailsError(t *testing.T) {
+func Test_Transfers_TransfersResource_GetDetailsXmlError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -183,6 +246,33 @@ func Test_Transfers_TransfersResource_GetDetailsError(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "UNEXPECTED ERROR", err.Error())
+}
+
+func Test_Transfers_TransfersResource_GetDetailsNonXmlError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	var detail GetDetailsRequestDetailParamsString = "TR0000000001"
+	details := []GetDetailsDetailParamsInterface{&detail}
+	result, resp, err := resource.GetDetails(details, ctx, nil)
+
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "TransfersResource.GetDetails error: EOF", err.Error())
 }
 
 func Test_Transfers_GetDetailsResponse_MarshalJsonSuccess(t *testing.T) {
@@ -275,7 +365,7 @@ func Test_Transfers_TransfersResource_CreateTransferSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Transfers_TransfersResource_CreateTransferError(t *testing.T) {
+func Test_Transfers_TransfersResource_CreateTransferXmlError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -328,6 +418,38 @@ func Test_Transfers_TransfersResource_CreateTransferError(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "NOT ACCEPTABLE TRANSFER", err.Error())
+}
+
+func Test_Transfers_TransfersResource_CreateTransferNonXmlError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		To:       "FP89680",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	result, resp, err := resource.CreateTransfer([]*CreateTransferRequestParams{transfer}, ctx, nil)
+
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "TransfersResource.CreateTransfer error: EOF", err.Error())
 }
 
 func Test_Transfers_CreateTransferResponse_MarshalJsonSuccess(t *testing.T) {

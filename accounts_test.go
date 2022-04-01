@@ -55,7 +55,7 @@ func Test_Accounts_AccountsResource_GetAccountsSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Accounts_AccountsResource_GetAccountsError(t *testing.T) {
+func Test_Accounts_AccountsResource_GetAccountsXmlError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -92,6 +92,33 @@ func Test_Accounts_AccountsResource_GetAccountsError(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "UNEXPECTED ERROR", err.Error())
+}
+
+func Test_Accounts_AccountsResource_GetAccountsNonXmlError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &AccountsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	accounts := []string{"FP0000001"}
+	result, resp, err := resource.GetAccounts(accounts, ctx, nil)
+
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "AccountsResource.GetAccounts error: EOF", err.Error())
 }
 
 func Test_Accounts_GetAccountsResponse_MarshalJsonSuccess(t *testing.T) {
@@ -157,7 +184,7 @@ func Test_Accounts_AccountsResource_GetBalancesSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Accounts_GetBalancesResponse_GetBalancesError(t *testing.T) {
+func Test_Accounts_GetBalancesResponse_GetBalancesXmlError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -194,6 +221,33 @@ func Test_Accounts_GetBalancesResponse_GetBalancesError(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "UNEXPECTED ERROR", err.Error())
+}
+
+func Test_Accounts_GetBalancesResponse_GetBalancesNonXmlError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &AccountsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	currencies := []CurrencyCode{CurrencyCodeIDR, CurrencyCodeUSD}
+	result, resp, err := resource.GetBalances(currencies, ctx, nil)
+
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "AccountsResource.GetBalances error: EOF", err.Error())
 }
 
 func Test_Accounts_GetBalancesResponse_MarshalJsonSuccess(t *testing.T) {

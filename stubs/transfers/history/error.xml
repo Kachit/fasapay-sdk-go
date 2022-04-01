@@ -1,0 +1,8 @@
+<fasa_response id="1312342474" date_time="2011-08-03T10:34:34+07:00">
+    <errors mode="history" code="40701">
+        <data>
+            <message>INVALID DATE FORMAT (yyyy-mm-dd)</message>
+            <detail>INVALID DATE FORMAT (yyyy-mm-dd) foo</detail>
+        </data>
+    </errors>
+</fasa_response>
