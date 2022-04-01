@@ -110,6 +110,38 @@ func (r *ResponseBody) IsSuccess() bool {
 	return r.Errors == nil
 }
 
+//GetError method
+func (r *ResponseBody) GetError() string {
+	var message string
+	switch r.Errors.Code {
+	case ErrorCodeNotValidXmlRequest:
+		message = ErrorMessageNotValidXmlRequest
+		break
+	case ErrorCodeUnauthorized:
+		message = ErrorMessageUnauthorized
+		break
+	case ErrorCodeNotAcceptableTransfer:
+		message = ErrorMessageNotAcceptableTransfer
+		break
+	case ErrorCodeDetailRequestError:
+		message = ErrorMessageDetailRequestError
+		break
+	case ErrorCodeHistoryRequestError:
+		message = ErrorMessageHistoryRequestError
+		break
+	case ErrorCodeBalanceRequestError:
+		message = ErrorMessageBalanceRequestError
+		break
+	case ErrorCodeAccountRequestError:
+		message = ErrorMessageAccountRequestError
+		break
+	default:
+		message = ErrorMessageUnexpectedError
+		break
+	}
+	return message
+}
+
 //ResponseBodyErrors struct
 type ResponseBodyErrors struct {
 	XMLName xml.Name                   `xml:"errors" json:"-"`

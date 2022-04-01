@@ -70,7 +70,7 @@ func Test_Accounts_AccountsResource_GetAccountsError(t *testing.T) {
 	ctx := context.Background()
 	accounts := []string{"FP0000001"}
 	result, resp, err := resource.GetAccounts(accounts, ctx, nil)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	assert.NotEmpty(t, resp)
 	assert.NotEmpty(t, result)
 	//common
@@ -90,6 +90,8 @@ func Test_Accounts_AccountsResource_GetAccountsError(t *testing.T) {
 	defer resp.Body.Close()
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
 	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "UNEXPECTED ERROR", err.Error())
 }
 
 func Test_Accounts_GetAccountsResponse_MarshalJsonSuccess(t *testing.T) {
@@ -124,38 +126,74 @@ func Test_Accounts_GetBalancesRequest_MarshalXmlSuccess(t *testing.T) {
 	assert.Equal(t, expected, string(bytes))
 }
 
-func Test_Accounts_GetBalancesResponse_UnmarshalXmlSuccess(t *testing.T) {
-	var response GetBalancesResponse
+func Test_Accounts_AccountsResource_GetBalancesSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &AccountsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+
 	body, _ := LoadStubResponseData("stubs/accounts/balances/success.xml")
-	err := xml.Unmarshal(body, &response)
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	currencies := []CurrencyCode{CurrencyCodeIDR, CurrencyCodeUSD}
+	result, resp, err := resource.GetBalances(currencies, ctx, nil)
 	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
 	//common
-	assert.True(t, response.IsSuccess())
-	assert.Equal(t, "1234567", response.Id)
-	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
-	//accounts
-	assert.Equal(t, 19092587.45, response.Balances.IDR)
-	assert.Equal(t, 3987.31, response.Balances.USD)
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, "1234567", result.Id)
+	assert.Equal(t, "2013-01-01T10:58:43+07:00", result.DateTime)
+	//balances
+	assert.Equal(t, 19092587.45, result.Balances.IDR)
+	assert.Equal(t, 3987.31, result.Balances.USD)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Accounts_GetBalancesResponse_UnmarshalXmlError(t *testing.T) {
-	var response GetBalancesResponse
-	body, _ := LoadStubResponseData("stubs/accounts/balances/error.xml")
-	err := xml.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	//common
-	assert.False(t, response.IsSuccess())
-	assert.Equal(t, "1234567", response.Id)
-	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
-	//errors
-	assert.Equal(t, uint64(40901), response.Errors.Code)
-	assert.Equal(t, "balance", response.Errors.Mode)
-	assert.Equal(t, "", response.Errors.Id)
+func Test_Accounts_GetBalancesResponse_GetBalancesError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
-	assert.Equal(t, uint64(0), response.Errors.Data[0].Code)
-	assert.Equal(t, "", response.Errors.Data[0].Attribute)
-	assert.Equal(t, "WRONG OR INACTIVE CURRENCY", response.Errors.Data[0].Message)
-	assert.Equal(t, "WRONG OR INACTIVE CURRENCY CHY", response.Errors.Data[0].Detail)
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &AccountsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+
+	body, _ := LoadStubResponseData("stubs/accounts/balances/error.xml")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	currencies := []CurrencyCode{CurrencyCodeIDR, CurrencyCodeUSD}
+	result, resp, err := resource.GetBalances(currencies, ctx, nil)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//common
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, "1234567", result.Id)
+	assert.Equal(t, "2013-01-01T10:58:43+07:00", result.DateTime)
+	//errors
+	assert.Equal(t, uint64(40901), result.Errors.Code)
+	assert.Equal(t, "balance", result.Errors.Mode)
+	assert.Equal(t, "", result.Errors.Id)
+
+	assert.Equal(t, uint64(0), result.Errors.Data[0].Code)
+	assert.Equal(t, "", result.Errors.Data[0].Attribute)
+	assert.Equal(t, "WRONG OR INACTIVE CURRENCY", result.Errors.Data[0].Message)
+	assert.Equal(t, "WRONG OR INACTIVE CURRENCY CHY", result.Errors.Data[0].Detail)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "UNEXPECTED ERROR", err.Error())
 }
 
 func Test_Accounts_GetBalancesResponse_MarshalJsonSuccess(t *testing.T) {

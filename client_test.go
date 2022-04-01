@@ -12,6 +12,14 @@ func Test_Client_NewClientFromConfigValid(t *testing.T) {
 	assert.NotEmpty(t, client)
 }
 
+func Test_Client_NewClientFromConfigInvalid(t *testing.T) {
+	cfg := BuildStubConfig()
+	cfg.Uri = ""
+	client, err := NewClientFromConfig(cfg, nil)
+	assert.Error(t, err)
+	assert.Empty(t, client)
+}
+
 func Test_Client_GetAccountsResource(t *testing.T) {
 	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Accounts()

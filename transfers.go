@@ -181,6 +181,9 @@ func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestPar
 	if err != nil {
 		return nil, rsp, fmt.Errorf("TransfersResource.CreateTransfer error: %v", err)
 	}
+	if !result.IsSuccess() {
+		return &result, rsp, fmt.Errorf(result.GetError())
+	}
 	return &result, rsp, nil
 }
 
@@ -200,6 +203,9 @@ func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx con
 	if err != nil {
 		return nil, rsp, fmt.Errorf("TransfersResource.GetHistory error: %v", err)
 	}
+	if !result.IsSuccess() {
+		return &result, rsp, fmt.Errorf(result.GetError())
+	}
 	return &result, rsp, nil
 }
 
@@ -218,6 +224,9 @@ func (r *TransfersResource) GetDetails(details []GetDetailsDetailParamsInterface
 	err = r.unmarshalResponse(rsp, &result)
 	if err != nil {
 		return nil, rsp, fmt.Errorf("TransfersResource.GetDetails error: %v", err)
+	}
+	if !result.IsSuccess() {
+		return &result, rsp, fmt.Errorf(result.GetError())
 	}
 	return &result, rsp, nil
 }

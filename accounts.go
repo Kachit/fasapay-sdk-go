@@ -65,6 +65,9 @@ func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Co
 	if err != nil {
 		return nil, rsp, fmt.Errorf("AccountsResource.GetBalances error: %v", err)
 	}
+	if !result.IsSuccess() {
+		return &result, rsp, fmt.Errorf(result.GetError())
+	}
 	return &result, rsp, nil
 }
 
@@ -83,6 +86,9 @@ func (r *AccountsResource) GetAccounts(accounts []string, ctx context.Context, a
 	err = r.unmarshalResponse(rsp, &result)
 	if err != nil {
 		return nil, rsp, fmt.Errorf("AccountsResource.GetAccounts error: %v", err)
+	}
+	if !result.IsSuccess() {
+		return &result, rsp, fmt.Errorf(result.GetError())
 	}
 	return &result, rsp, nil
 }

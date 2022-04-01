@@ -1,9 +1,13 @@
 package fasapay
 
 import (
+	"context"
 	"encoding/json"
 	"encoding/xml"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
 	"testing"
 )
 
@@ -23,37 +27,53 @@ func Test_Transfers_GetHistoryRequest_MarshalXmlSuccess(t *testing.T) {
 	assert.Equal(t, expected, string(bytes))
 }
 
-func Test_Transfers_GetHistoryResponse_UnmarshalXmlSuccess(t *testing.T) {
-	var response GetHistoryResponse
-	body, _ := LoadStubResponseData("stubs/transfers/history/success.xml")
-	err := xml.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	//common
-	assert.True(t, response.IsSuccess())
-	assert.Equal(t, "1312342474", response.Id)
-	assert.Equal(t, "2011-08-03T10:34:34+07:00", response.DateTime)
-	//pagination
-	assert.Equal(t, uint64(579), response.History.Page.TotalItem)
-	assert.Equal(t, uint64(58), response.History.Page.PageCount)
-	assert.Equal(t, uint64(0), response.History.Page.CurrentPage)
-	//details
-	assert.Equal(t, "TR2011072685119", response.History.Details[0].BatchNumber)
-	assert.Equal(t, "2011-07-26 15:44:35", response.History.Details[0].Datetime)
-	assert.Equal(t, "Keluar", response.History.Details[0].Type)
-	assert.Equal(t, "FP10500", response.History.Details[0].To)
-	assert.Equal(t, "FP12049", response.History.Details[0].From)
-	assert.Equal(t, 11160.000, response.History.Details[0].Amount)
-	assert.Equal(t, "Pembayaran untuk pembelian Liberty Reserve", response.History.Details[0].Note)
-	assert.Equal(t, "FINISH", response.History.Details[0].Status)
+func Test_Transfers_TransfersResource_GetHistorySuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
-	assert.Equal(t, "TR2011072521135", response.History.Details[1].BatchNumber)
-	assert.Equal(t, "2011-07-25 11:38:43", response.History.Details[1].Datetime)
-	assert.Equal(t, "Keluar", response.History.Details[1].Type)
-	assert.Equal(t, "FP89680", response.History.Details[1].To)
-	assert.Equal(t, "FP12049", response.History.Details[1].From)
-	assert.Equal(t, 1000.000, response.History.Details[1].Amount)
-	assert.Equal(t, "standart operation", response.History.Details[1].Note)
-	assert.Equal(t, "FINISH", response.History.Details[1].Status)
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	body, _ := LoadStubResponseData("stubs/transfers/history/success.xml")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	historyFilter := &GetHistoryRequestParams{StartDate: "2022-03-01", EndDate: "2022-03-28"}
+	result, resp, err := resource.GetHistory(historyFilter, ctx, nil)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//common
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, "1312342474", result.Id)
+	assert.Equal(t, "2011-08-03T10:34:34+07:00", result.DateTime)
+	//pagination
+	assert.Equal(t, uint64(579), result.History.Page.TotalItem)
+	assert.Equal(t, uint64(58), result.History.Page.PageCount)
+	assert.Equal(t, uint64(0), result.History.Page.CurrentPage)
+	//details
+	assert.Equal(t, "TR2011072685119", result.History.Details[0].BatchNumber)
+	assert.Equal(t, "2011-07-26 15:44:35", result.History.Details[0].Datetime)
+	assert.Equal(t, "Keluar", result.History.Details[0].Type)
+	assert.Equal(t, "FP10500", result.History.Details[0].To)
+	assert.Equal(t, "FP12049", result.History.Details[0].From)
+	assert.Equal(t, 11160.000, result.History.Details[0].Amount)
+	assert.Equal(t, "Pembayaran untuk pembelian Liberty Reserve", result.History.Details[0].Note)
+	assert.Equal(t, "FINISH", result.History.Details[0].Status)
+
+	assert.Equal(t, "TR2011072521135", result.History.Details[1].BatchNumber)
+	assert.Equal(t, "2011-07-25 11:38:43", result.History.Details[1].Datetime)
+	assert.Equal(t, "Keluar", result.History.Details[1].Type)
+	assert.Equal(t, "FP89680", result.History.Details[1].To)
+	assert.Equal(t, "FP12049", result.History.Details[1].From)
+	assert.Equal(t, 1000.000, result.History.Details[1].Amount)
+	assert.Equal(t, "standart operation", result.History.Details[1].Note)
+	assert.Equal(t, "FINISH", result.History.Details[1].Status)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
 func Test_Transfers_GetHistoryResponse_MarshalJsonSuccess(t *testing.T) {
@@ -76,54 +96,93 @@ func Test_Transfers_GetDetailsRequest_MarshalXmlSuccess(t *testing.T) {
 	expected := `<fasa_request id="1234567"><auth><api_key>11123548cd3a5e5613325132112becf</api_key><token>e910361e42dafdfd100b19701c2ef403858cab640fd699afc67b78c7603ddb1b</token></auth><detail>foo</detail><detail><ref>foo</ref></detail></fasa_request>`
 	assert.NoError(t, err)
 	assert.Equal(t, expected, string(bytes))
+	assert.Equal(t, "struct", detailParam2.GetDetailType())
+	assert.Equal(t, "string", detailParam1.GetDetailType())
 }
 
-func Test_Transfers_GetDetailsResponse_UnmarshalXmlSuccess(t *testing.T) {
-	var response GetDetailsResponse
+func Test_Transfers_TransfersResource_GetDetailsSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
 	body, _ := LoadStubResponseData("stubs/transfers/details/success.xml")
-	err := xml.Unmarshal(body, &response)
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	var detail GetDetailsRequestDetailParamsString = "TR0000000001"
+	details := []GetDetailsDetailParamsInterface{&detail}
+	result, resp, err := resource.GetDetails(details, ctx, nil)
 	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
 	//common
-	assert.True(t, response.IsSuccess())
-	assert.Equal(t, "1234567", response.Id)
-	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, "1234567", result.Id)
+	assert.Equal(t, "2013-01-01T10:58:43+07:00", result.DateTime)
 	//detail
-	assert.Equal(t, "detail", response.Details[0].Mode)
-	assert.Equal(t, uint64(210), response.Details[0].Code)
-	assert.Equal(t, "TR2012092791234", response.Details[0].BatchNumber)
-	assert.Equal(t, "2012-10-20", response.Details[0].Date)
-	assert.Equal(t, "10:09:36", response.Details[0].Time)
-	assert.Equal(t, "FP00001", response.Details[0].From)
-	assert.Equal(t, "FP00002", response.Details[0].To)
-	assert.Equal(t, 1000.000, response.Details[0].Amount)
-	assert.Equal(t, 100.000, response.Details[0].Fee)
-	assert.Equal(t, float64(1100), response.Details[0].Total)
-	assert.Equal(t, "FiS", response.Details[0].FeeMode)
-	assert.Equal(t, "IDR", response.Details[0].Currency)
-	assert.Equal(t, "Payment for something", response.Details[0].Note)
-	assert.Equal(t, "FINISH", response.Details[0].Status)
-	assert.Equal(t, "Transfer Out", response.Details[0].Type)
-	assert.Equal(t, "api_xml", response.Details[0].Method)
+	assert.Equal(t, "detail", result.Details[0].Mode)
+	assert.Equal(t, uint64(210), result.Details[0].Code)
+	assert.Equal(t, "TR2012092791234", result.Details[0].BatchNumber)
+	assert.Equal(t, "2012-10-20", result.Details[0].Date)
+	assert.Equal(t, "10:09:36", result.Details[0].Time)
+	assert.Equal(t, "FP00001", result.Details[0].From)
+	assert.Equal(t, "FP00002", result.Details[0].To)
+	assert.Equal(t, 1000.000, result.Details[0].Amount)
+	assert.Equal(t, 100.000, result.Details[0].Fee)
+	assert.Equal(t, float64(1100), result.Details[0].Total)
+	assert.Equal(t, "FiS", result.Details[0].FeeMode)
+	assert.Equal(t, "IDR", result.Details[0].Currency)
+	assert.Equal(t, "Payment for something", result.Details[0].Note)
+	assert.Equal(t, "FINISH", result.Details[0].Status)
+	assert.Equal(t, "Transfer Out", result.Details[0].Type)
+	assert.Equal(t, "api_xml", result.Details[0].Method)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Transfers_GetDetailsResponse_UnmarshalXmlError(t *testing.T) {
-	var response GetDetailsResponse
-	body, _ := LoadStubResponseData("stubs/transfers/details/error.xml")
-	err := xml.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	//common
-	assert.False(t, response.IsSuccess())
-	assert.Equal(t, "1234567", response.Id)
-	assert.Equal(t, "2013-01-01T10:58:43+07:00", response.DateTime)
-	//errors
-	assert.Equal(t, uint64(40701), response.Errors.Code)
-	assert.Equal(t, "detail", response.Errors.Mode)
-	assert.Equal(t, "", response.Errors.Id)
+func Test_Transfers_TransfersResource_GetDetailsError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
-	assert.Equal(t, uint64(0), response.Errors.Data[0].Code)
-	assert.Equal(t, "", response.Errors.Data[0].Attribute)
-	assert.Equal(t, "TRANSACTION NOT FOUND", response.Errors.Data[0].Message)
-	assert.Equal(t, "BATCHNUMBER TR2012100291308 NOT FOUND", response.Errors.Data[0].Detail)
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	body, _ := LoadStubResponseData("stubs/transfers/details/error.xml")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	var detail GetDetailsRequestDetailParamsString = "TR0000000001"
+	details := []GetDetailsDetailParamsInterface{&detail}
+	result, resp, err := resource.GetDetails(details, ctx, nil)
+
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//common
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, "1234567", result.Id)
+	assert.Equal(t, "2013-01-01T10:58:43+07:00", result.DateTime)
+	//errors
+	assert.Equal(t, uint64(40701), result.Errors.Code)
+	assert.Equal(t, "detail", result.Errors.Mode)
+	assert.Equal(t, "", result.Errors.Id)
+
+	assert.Equal(t, uint64(0), result.Errors.Data[0].Code)
+	assert.Equal(t, "", result.Errors.Data[0].Attribute)
+	assert.Equal(t, "TRANSACTION NOT FOUND", result.Errors.Data[0].Message)
+	assert.Equal(t, "BATCHNUMBER TR2012100291308 NOT FOUND", result.Errors.Data[0].Detail)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "UNEXPECTED ERROR", err.Error())
 }
 
 func Test_Transfers_GetDetailsResponse_MarshalJsonSuccess(t *testing.T) {
@@ -165,63 +224,110 @@ func Test_Transfers_CreateTransferRequest_MarshalXmlSuccess(t *testing.T) {
 	assert.Equal(t, expected, string(bytes))
 }
 
-func Test_Transfers_CreateTransferResponse_UnmarshalXmlSuccess(t *testing.T) {
-	var response CreateTransferResponse
+func Test_Transfers_TransfersResource_CreateTransferSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
 	body, _ := LoadStubResponseData("stubs/transfers/transfer/success.xml")
-	err := xml.Unmarshal(body, &response)
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		To:       "FP89680",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	result, resp, err := resource.CreateTransfer([]*CreateTransferRequestParams{transfer}, ctx, nil)
 	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
 	//common
-	assert.True(t, response.IsSuccess())
-	assert.Equal(t, "1311059195", response.Id)
-	assert.Equal(t, "2011-07-19T14:06:35+07:00", response.DateTime)
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, "1311059195", result.Id)
+	assert.Equal(t, "2011-07-19T14:06:35+07:00", result.DateTime)
 	//transfer
-	assert.Equal(t, "transfer", response.Transfers[0].Mode)
-	assert.Equal(t, uint64(203), response.Transfers[0].Code)
-	assert.Equal(t, "TR2011071917277", response.Transfers[0].BatchNumber)
-	assert.Equal(t, "2011-07-19", response.Transfers[0].Date)
-	assert.Equal(t, "14:06:35", response.Transfers[0].Time)
-	assert.Equal(t, "FP12049", response.Transfers[0].From)
-	assert.Equal(t, "FP89680", response.Transfers[0].To)
-	assert.Equal(t, 1000.0, response.Transfers[0].Amount)
-	assert.Equal(t, float64(100), response.Transfers[0].Fee)
-	assert.Equal(t, 1100.0, response.Transfers[0].Total)
-	assert.Equal(t, "FiS", response.Transfers[0].FeeMode)
-	assert.Equal(t, "IDR", response.Transfers[0].Currency)
-	assert.Equal(t, "standart operation", response.Transfers[0].Note)
-	assert.Equal(t, "FINISH", response.Transfers[0].Status)
-	assert.Equal(t, "Keluar", response.Transfers[0].Type)
-	assert.Equal(t, 2815832.00, response.Transfers[0].Balance)
-	assert.Equal(t, "xml_api", response.Transfers[0].Method)
+	assert.Equal(t, "transfer", result.Transfers[0].Mode)
+	assert.Equal(t, uint64(203), result.Transfers[0].Code)
+	assert.Equal(t, "TR2011071917277", result.Transfers[0].BatchNumber)
+	assert.Equal(t, "2011-07-19", result.Transfers[0].Date)
+	assert.Equal(t, "14:06:35", result.Transfers[0].Time)
+	assert.Equal(t, "FP12049", result.Transfers[0].From)
+	assert.Equal(t, "FP89680", result.Transfers[0].To)
+	assert.Equal(t, 1000.0, result.Transfers[0].Amount)
+	assert.Equal(t, float64(100), result.Transfers[0].Fee)
+	assert.Equal(t, 1100.0, result.Transfers[0].Total)
+	assert.Equal(t, "FiS", result.Transfers[0].FeeMode)
+	assert.Equal(t, "IDR", result.Transfers[0].Currency)
+	assert.Equal(t, "standart operation", result.Transfers[0].Note)
+	assert.Equal(t, "FINISH", result.Transfers[0].Status)
+	assert.Equal(t, "Keluar", result.Transfers[0].Type)
+	assert.Equal(t, 2815832.00, result.Transfers[0].Balance)
+	assert.Equal(t, "xml_api", result.Transfers[0].Method)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Transfers_CreateTransferResponse_UnmarshalXmlError(t *testing.T) {
-	var response CreateTransferResponse
+func Test_Transfers_TransfersResource_CreateTransferError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
 	body, _ := LoadStubResponseData("stubs/transfers/transfer/error.xml")
-	err := xml.Unmarshal(body, &response)
-	assert.NoError(t, err)
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		To:       "FP89680",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	result, resp, err := resource.CreateTransfer([]*CreateTransferRequestParams{transfer}, ctx, nil)
+
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
 	//common
-	assert.False(t, response.IsSuccess())
-	assert.Equal(t, "1311059195", response.Id)
-	assert.Equal(t, "2011-07-19T14:06:35+07:00", response.DateTime)
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, "1311059195", result.Id)
+	assert.Equal(t, "2011-07-19T14:06:35+07:00", result.DateTime)
 	//errors
-	assert.Equal(t, uint64(40600), response.Errors.Code)
-	assert.Equal(t, "transfer", response.Errors.Mode)
-	assert.Equal(t, "tid3", response.Errors.Id)
+	assert.Equal(t, uint64(40600), result.Errors.Code)
+	assert.Equal(t, "transfer", result.Errors.Mode)
+	assert.Equal(t, "tid3", result.Errors.Id)
 
-	assert.Equal(t, uint64(40605), response.Errors.Data[0].Code)
-	assert.Equal(t, "id_kurensi", response.Errors.Data[0].Attribute)
-	assert.Equal(t, "Kurensi tidak boleh kosong.", response.Errors.Data[0].Message)
-	assert.Equal(t, "", response.Errors.Data[0].Detail)
+	assert.Equal(t, uint64(40605), result.Errors.Data[0].Code)
+	assert.Equal(t, "id_kurensi", result.Errors.Data[0].Attribute)
+	assert.Equal(t, "Kurensi tidak boleh kosong.", result.Errors.Data[0].Message)
+	assert.Equal(t, "", result.Errors.Data[0].Detail)
 
-	assert.Equal(t, uint64(40601), response.Errors.Data[1].Code)
-	assert.Equal(t, "to", response.Errors.Data[1].Attribute)
-	assert.Equal(t, "Tidak ada User dengan Nomor Akun FP89681", response.Errors.Data[1].Message)
-	assert.Equal(t, "", response.Errors.Data[1].Detail)
+	assert.Equal(t, uint64(40601), result.Errors.Data[1].Code)
+	assert.Equal(t, "to", result.Errors.Data[1].Attribute)
+	assert.Equal(t, "Tidak ada User dengan Nomor Akun FP89681", result.Errors.Data[1].Message)
+	assert.Equal(t, "", result.Errors.Data[1].Detail)
 
-	assert.Equal(t, uint64(40602), response.Errors.Data[2].Code)
-	assert.Equal(t, "jumlah", response.Errors.Data[2].Attribute)
-	assert.Equal(t, "Jumlah melebihi batas yg diijinkan.", response.Errors.Data[2].Message)
-	assert.Equal(t, "", response.Errors.Data[2].Detail)
+	assert.Equal(t, uint64(40602), result.Errors.Data[2].Code)
+	assert.Equal(t, "jumlah", result.Errors.Data[2].Attribute)
+	assert.Equal(t, "Jumlah melebihi batas yg diijinkan.", result.Errors.Data[2].Message)
+	assert.Equal(t, "", result.Errors.Data[2].Detail)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "NOT ACCEPTABLE TRANSFER", err.Error())
 }
 
 func Test_Transfers_CreateTransferResponse_MarshalJsonSuccess(t *testing.T) {
