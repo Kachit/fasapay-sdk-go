@@ -314,6 +314,54 @@ func Test_Transfers_CreateTransferRequest_MarshalXmlSuccess(t *testing.T) {
 	assert.Equal(t, expected, string(bytes))
 }
 
+func Test_Transfers_CreateTransferRequest_IsValidSuccess(t *testing.T) {
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		To:       "FP89680",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	assert.Nil(t, transfer.isValid())
+	assert.NoError(t, transfer.isValid())
+}
+
+func Test_Transfers_CreateTransferRequest_IsValidEmptyParameterTo(t *testing.T) {
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	result := transfer.isValid()
+	assert.Error(t, result)
+	assert.Equal(t, `parameter "to" is empty`, result.Error())
+}
+
+func Test_Transfers_CreateTransferRequest_IsValidEmptyParameterCurrency(t *testing.T) {
+	transfer := &CreateTransferRequestParams{
+		Id:     "123",
+		To:     "FP89680",
+		Amount: 1000.0,
+		Note:   "standart operation",
+	}
+	result := transfer.isValid()
+	assert.Error(t, result)
+	assert.Equal(t, `parameter "currency" is empty`, result.Error())
+}
+
+func Test_Transfers_CreateTransferRequest_IsValidEmptyParameterAmount(t *testing.T) {
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		To:       "FP89680",
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	result := transfer.isValid()
+	assert.Error(t, result)
+	assert.Equal(t, `parameter "amount" is empty`, result.Error())
+}
+
 func Test_Transfers_TransfersResource_CreateTransferSuccess(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -363,6 +411,31 @@ func Test_Transfers_TransfersResource_CreateTransferSuccess(t *testing.T) {
 	defer resp.Body.Close()
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
 	assert.Equal(t, body, bodyRsp)
+}
+
+func Test_Transfers_TransfersResource_CreateTransferRequestError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	resource := &TransfersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+
+	ctx := context.Background()
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	result, resp, err := resource.CreateTransfer([]*CreateTransferRequestParams{transfer}, ctx, nil)
+
+	assert.Error(t, err)
+	assert.Empty(t, resp)
+	assert.Empty(t, result)
+	//error
+	assert.Equal(t, `TransfersResource.CreateTransfer error: parameter "to" is empty`, err.Error())
 }
 
 func Test_Transfers_TransfersResource_CreateTransferXmlError(t *testing.T) {
@@ -450,6 +523,40 @@ func Test_Transfers_TransfersResource_CreateTransferNonXmlError(t *testing.T) {
 	//assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "TransfersResource.CreateTransfer error: EOF", err.Error())
+}
+
+func Test_Transfers_TransfersResource_ValidateTransferParamsValid(t *testing.T) {
+	resource := &TransfersResource{}
+	transfer := &CreateTransferRequestParams{
+		Id:       "123",
+		To:       "FP89680",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	err := resource.validateTransferParams([]*CreateTransferRequestParams{transfer})
+	assert.Nil(t, err)
+	assert.NoError(t, err)
+}
+
+func Test_Transfers_TransfersResource_ValidateTransferParamsInvalid(t *testing.T) {
+	resource := &TransfersResource{}
+	transfer1 := &CreateTransferRequestParams{
+		Id:       "123",
+		To:       "FP89680",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	transfer2 := &CreateTransferRequestParams{
+		Id:       "123",
+		Amount:   1000.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+	err := resource.validateTransferParams([]*CreateTransferRequestParams{transfer1, transfer2})
+	assert.Error(t, err)
+	assert.Equal(t, `parameter "to" is empty`, err.Error())
 }
 
 func Test_Transfers_CreateTransferResponse_MarshalJsonSuccess(t *testing.T) {

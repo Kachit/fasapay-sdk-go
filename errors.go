@@ -11,12 +11,12 @@ const (
 )
 
 const (
-	ErrorMessageNotValidXmlRequest    string = "NOT VALID XML REQUEST"
-	ErrorMessageUnauthorized          string = "UNAUTHORIZED"
-	ErrorMessageNotAcceptableTransfer string = "NOT ACCEPTABLE TRANSFER"
-	ErrorMessageDetailRequestError    string = "DETAIL REQUEST ERROR"
-	ErrorMessageHistoryRequestError   string = "HISTORY REQUEST ERROR"
-	ErrorMessageBalanceRequestError   string = "BALANCE REQUEST ERROR"
-	ErrorMessageAccountRequestError   string = "ACCOUNT REQUEST ERROR"
-	ErrorMessageUnexpectedError       string = "UNEXPECTED ERROR"
+	ErrorMessageNotValidXmlRequest    string = "NOT VALID XML REQUEST"   //The sended XML are not valid, broken or has wrong format
+	ErrorMessageUnauthorized          string = "UNAUTHORIZED"            //Authorisation failed.
+	ErrorMessageNotAcceptableTransfer string = "NOT ACCEPTABLE TRANSFER" //There is an error in the transfer operation
+	ErrorMessageDetailRequestError    string = "DETAIL REQUEST ERROR"    //There is an error in the detail operation
+	ErrorMessageHistoryRequestError   string = "HISTORY REQUEST ERROR"   //There is an error in the history operation
+	ErrorMessageBalanceRequestError   string = "BALANCE REQUEST ERROR"   //There is an error in the balance operation
+	ErrorMessageAccountRequestError   string = "ACCOUNT REQUEST ERROR"   //There is an error in the account operation
+	ErrorMessageUnexpectedError       string = "UNEXPECTED ERROR"        //Unexpected error
 )

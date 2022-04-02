@@ -50,7 +50,7 @@ type AccountsResource struct {
 	*ResourceAbstract
 }
 
-//GetBalances method
+//GetBalances method - allow you to check your FasaPay account balance.
 func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Context, attributes *RequestParamsAttributes) (*GetBalancesResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetBalancesRequest{baseRequestParams, currencies}
@@ -73,7 +73,7 @@ func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Co
 	return &result, rsp, nil
 }
 
-//GetAccounts method
+//GetAccounts method - allow you to check specific FasaPay account, to indicate is it registered or not.
 func (r *AccountsResource) GetAccounts(accounts []string, ctx context.Context, attributes *RequestParamsAttributes) (*GetAccountsResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetAccountsRequest{baseRequestParams, accounts}
