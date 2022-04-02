@@ -16,26 +16,26 @@ type ResourceAbstract struct {
 }
 
 //BuildAuthParams method
-func (rb *ResourceAbstract) buildAuthRequestParams(dt time.Time) *RequestAuthParams {
+func (ra *ResourceAbstract) buildAuthRequestParams(dt time.Time) *RequestAuthParams {
 	params := &RequestAuthParams{
-		ApiKey: rb.cfg.ApiKey,
-		Token:  generateAuthToken(rb.cfg.ApiKey, rb.cfg.ApiSecretWord, dt),
+		ApiKey: ra.cfg.ApiKey,
+		Token:  generateAuthToken(ra.cfg.ApiKey, ra.cfg.ApiSecretWord, dt),
 	}
 	return params
 }
 
 //BuildParams method
-func (rb *ResourceAbstract) buildRequestParams(attributes *RequestParamsAttributes) *RequestParams {
+func (ra *ResourceAbstract) buildRequestParams(attributes *RequestParamsAttributes) *RequestParams {
 	if attributes == nil {
 		dt := time.Now().UTC()
 		attributes = &RequestParamsAttributes{Id: fmt.Sprint(dt.Unix()), DateTime: dt}
 	}
-	params := &RequestParams{Id: attributes.Id, Auth: rb.buildAuthRequestParams(attributes.DateTime)}
+	params := &RequestParams{Id: attributes.Id, Auth: ra.buildAuthRequestParams(attributes.DateTime)}
 	return params
 }
 
 //UnmarshalResponse func
-func (rb *ResourceAbstract) marshalRequestParams(request interface{}) ([]byte, error) {
+func (ra *ResourceAbstract) marshalRequestParams(request interface{}) ([]byte, error) {
 	bts, err := xml.Marshal(request)
 	if err != nil {
 		return nil, err
@@ -46,11 +46,11 @@ func (rb *ResourceAbstract) marshalRequestParams(request interface{}) ([]byte, e
 }
 
 //UnmarshalResponse func
-func (rb *ResourceAbstract) unmarshalResponse(resp *http.Response, v interface{}) error {
+func (ra *ResourceAbstract) unmarshalResponse(resp *http.Response, v interface{}) error {
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Response.Unmarshal read body: %v", err)
+		return fmt.Errorf("ResourceAbstract.unmarshalResponse read body: %v", err)
 	}
 	//reset the response body to the original unread state
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
