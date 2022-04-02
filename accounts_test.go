@@ -114,9 +114,9 @@ func Test_Accounts_AccountsResource_GetAccountsNonXmlError(t *testing.T) {
 	assert.NotEmpty(t, resp)
 	assert.Empty(t, result)
 	//response
-	//defer resp.Body.Close()
-	//bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	//assert.Equal(t, body, bodyRsp)
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "AccountsResource.GetAccounts error: EOF", err.Error())
 }
@@ -243,9 +243,9 @@ func Test_Accounts_GetBalancesResponse_GetBalancesNonXmlError(t *testing.T) {
 	assert.NotEmpty(t, resp)
 	assert.Empty(t, result)
 	//response
-	//defer resp.Body.Close()
-	//bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	//assert.Equal(t, body, bodyRsp)
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "AccountsResource.GetBalances error: EOF", err.Error())
 }
