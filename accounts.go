@@ -45,10 +45,12 @@ type GetAccountsResponseParams struct {
 	Status   string   `xml:"status" json:"status"`
 }
 
+//AccountsResource struct
 type AccountsResource struct {
 	*ResourceAbstract
 }
 
+//GetBalances method
 func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Context, attributes *RequestParamsAttributes) (*GetBalancesResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetBalancesRequest{baseRequestParams, currencies}
@@ -71,6 +73,7 @@ func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Co
 	return &result, rsp, nil
 }
 
+//GetAccounts method
 func (r *AccountsResource) GetAccounts(accounts []string, ctx context.Context, attributes *RequestParamsAttributes) (*GetAccountsResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetAccountsRequest{baseRequestParams, accounts}

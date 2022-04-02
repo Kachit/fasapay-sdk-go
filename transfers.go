@@ -161,10 +161,12 @@ type GetDetailsResponseDetailParams struct {
 	FeeMode     string   `xml:"fee_mod" json:"fee_mod"`
 }
 
+//TransfersResource struct
 type TransfersResource struct {
 	*ResourceAbstract
 }
 
+//CreateTransfer method
 func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestParams, ctx context.Context, attributes *RequestParamsAttributes) (*CreateTransferResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &CreateTransferRequest{baseRequestParams, transfers}
@@ -187,6 +189,7 @@ func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestPar
 	return &result, rsp, nil
 }
 
+//GetHistory method
 func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx context.Context, attributes *RequestParamsAttributes) (*GetHistoryResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetHistoryRequest{baseRequestParams, history}
@@ -209,6 +212,7 @@ func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx con
 	return &result, rsp, nil
 }
 
+//GetDetails method
 func (r *TransfersResource) GetDetails(details []GetDetailsDetailParamsInterface, ctx context.Context, attributes *RequestParamsAttributes) (*GetDetailsResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetDetailsRequest{baseRequestParams, details}
