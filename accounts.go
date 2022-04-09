@@ -51,9 +51,13 @@ type AccountsResource struct {
 }
 
 //GetBalances method - allow you to check your FasaPay account balance.
+//
 //Balance request is used to get the amount of balance in your account.
+//
 //Balance request only needs currency code of currency that you want to see.  (IDR, USD)
-//xml format for single balance request:
+//
+//Xml format for single balance request:
+//
 //<fasa_request id="1234567">
 //    <auth>
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -61,7 +65,9 @@ type AccountsResource struct {
 //    </auth>
 //    <balance>IDR</balance>
 //</fasa_request>
-//xml format for batch balances request:
+//
+//Xml format for batch balances request:
+//
 //<fasa_request id="1234567">
 //    <auth><!-- authentication tag. required on every request -->
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -70,6 +76,7 @@ type AccountsResource struct {
 //    <balance>IDR</balance>
 //    <balance>USD</balance>
 //</fasa_request>
+//
 func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Context, attributes *RequestParamsAttributes) (*GetBalancesResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetBalancesRequest{baseRequestParams, currencies}
@@ -93,9 +100,13 @@ func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Co
 }
 
 //GetAccounts method - allow you to check specific FasaPay account, to indicate is it registered or not.
+//
 //Account request is used to get the information of certain FasaPay user by their account number.
+//
 //Account request only needs account number of FasaPay account that you want to see.
-//basic xml format for single account request:
+//
+//Basic xml format for single account request:
+//
 //<fasa_request id="1234567">
 //    <auth>
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -103,7 +114,9 @@ func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Co
 //    </auth>
 //    <account>FP00001</account>
 //</fasa_request>
-//basic xml format for batch accounts request:
+//
+//Basic xml format for batch accounts request:
+//
 //<fasa_request id="1234567">
 //    <auth><!-- authentication tag. required on every request -->
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -112,6 +125,7 @@ func (r *AccountsResource) GetBalances(currencies []CurrencyCode, ctx context.Co
 //    <account>FP00001</account>
 //    <account>FP00002</account>
 //</fasa_request>
+//
 func (r *AccountsResource) GetAccounts(accounts []string, ctx context.Context, attributes *RequestParamsAttributes) (*GetAccountsResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetAccountsRequest{baseRequestParams, accounts}
