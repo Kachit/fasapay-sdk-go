@@ -34,7 +34,7 @@ func (ra *ResourceAbstract) buildRequestParams(attributes *RequestParamsAttribut
 	return params
 }
 
-//UnmarshalResponse func
+//MarshalRequestParams method
 func (ra *ResourceAbstract) marshalRequestParams(request interface{}) ([]byte, error) {
 	bts, err := xml.Marshal(request)
 	if err != nil {
@@ -45,7 +45,7 @@ func (ra *ResourceAbstract) marshalRequestParams(request interface{}) ([]byte, e
 	return req, nil
 }
 
-//UnmarshalResponse func
+//UnmarshalResponse method
 func (ra *ResourceAbstract) unmarshalResponse(resp *http.Response, v interface{}) error {
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)

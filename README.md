@@ -58,7 +58,7 @@ fmt.Println(result.Balances.USD)
 ### Get accounts list
 ```go
 ctx := context.Background()
-accounts := []string{"FP0000001"}
+accounts := []string{"FP0000001", "FP0000002"}
 result, resp, err := client.Accounts().GetAccounts(accounts, ctx, nil)
 
 if err != nil {
@@ -78,14 +78,22 @@ fmt.Println(result.Accounts[0].Status)
 ### Create transfer
 ```go
 ctx := context.Background()
-transfer := &CreateTransferRequestParams{
+transfer1 := &CreateTransferRequestParams{
 		Id:       "123",
 		To:       "FP89680",
 		Amount:   1000.0,
 		Currency: CurrencyCodeIDR,
 		Note:     "standart operation",
 	}
-result, resp, err := client.Transfers().CreateTransfer(transfer, ctx, nil)
+
+transfer2 := &CreateTransferRequestParams{
+		Id:       "1234",
+		To:       "FP89681",
+		Amount:   1001.0,
+		Currency: CurrencyCodeIDR,
+		Note:     "standart operation",
+	}
+result, resp, err := client.Transfers().CreateTransfer([]*CreateTransferRequestParams{transfer, transfer2}, ctx, nil)
 
 if err != nil {
     fmt.Printf("Wrong API request " + err.Error())
@@ -102,6 +110,13 @@ fmt.Println(result.Transfers[0].From)
 fmt.Println(result.Transfers[0].To)
 fmt.Println(result.Transfers[0].Amount)
 fmt.Println(result.Transfers[0].Note)
+
+fmt.Println(result.Transfers[1].BatchNumber)
+fmt.Println(result.Transfers[1].Datetime)
+fmt.Println(result.Transfers[1].From)
+fmt.Println(result.Transfers[1].To)
+fmt.Println(result.Transfers[1].Amount)
+fmt.Println(result.Transfers[1].Note)
 ```
 
 ### Get transfers history
@@ -134,8 +149,9 @@ fmt.Println(result.History.Details[0].Note)
 ### Get transfers details
 ```go
 ctx := context.Background()
-var detail fasapay.GetDetailsRequestDetailParamsString = "TR0000000001"
-details := []fasapay.GetDetailsDetailParamsInterface{&detail}
+var detail1 fasapay.GetDetailsRequestDetailParamsString = "TR0000000001"
+var detail2 fasapay.GetDetailsRequestDetailParamsString = "TR0000000002"
+details := []fasapay.GetDetailsDetailParamsInterface{&detail1, &detail2}
 result, resp, err := client.Transfers().GetDetails(details, ctx, nil)
 
 if err != nil {
@@ -153,4 +169,11 @@ fmt.Println(result.Details[0].From)
 fmt.Println(result.Details[0].To)
 fmt.Println(result.Details[0].Amount)
 fmt.Println(result.Details[0].Note)
+
+fmt.Println(result.Details[1].BatchNumber)
+fmt.Println(result.Details[1].Datetime)
+fmt.Println(result.Details[1].From)
+fmt.Println(result.Details[1].To)
+fmt.Println(result.Details[1].Amount)
+fmt.Println(result.Details[1].Note)
 ```
