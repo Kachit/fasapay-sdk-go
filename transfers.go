@@ -179,8 +179,12 @@ type TransfersResource struct {
 	*ResourceAbstract
 }
 
-//CreateTransfer method - allow you to transfer fund from one account to another. With this command you may transfer any of the available currencies that FasaPay supports. This function also permits you to perform multiple (bulk) transfers.
-//xml format of single transfer request:
+//CreateTransfer method - allow you to transfer fund from one account to another.
+//With this command you may transfer any of the available currencies that FasaPay supports.
+//This function also permits you to perform multiple (bulk) transfers.
+//
+//Xml format of single transfer request:
+//
 //<fasa_request id="1234567">
 //    <auth>
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -193,7 +197,9 @@ type TransfersResource struct {
 //        <note>standart operation</note>
 //    </transfer>
 //</fasa_request>
-//xml format of batch transfer request:
+//
+//Xml format of batch transfer request:
+//
 //<fasa_request id="1234567">
 //    <auth><!-- authentication tag. required on every request -->
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -218,6 +224,7 @@ type TransfersResource struct {
 //        <note></note>
 //    </transfer>
 //</fasa_request>
+//
 func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestParams, ctx context.Context, attributes *RequestParamsAttributes) (*CreateTransferResponse, *http.Response, error) {
 	err := r.validateTransferParams(transfers)
 	if err != nil {
@@ -246,7 +253,9 @@ func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestPar
 
 //GetHistory method - allow you to receive history transaction of your FasaPay account. this command has many additional parameter to filter the response like date range, currencies, type of transaction, account target, etc.
 //Request history does not need any parameter to get 10 latest transactions
-//basic xml format for history request:
+//
+//Basic xml format for history request:
+//
 //<fasa_request id="1234567">
 //    <auth><!-- authentication tag. required on every request -->
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -262,6 +271,7 @@ func (r *TransfersResource) CreateTransfer(transfers []*CreateTransferRequestPar
 //        <page_size>5</page_size>
 //    </history>
 //</fasa_request>
+//
 func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx context.Context, attributes *RequestParamsAttributes) (*GetHistoryResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetHistoryRequest{baseRequestParams, history}
@@ -285,12 +295,19 @@ func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx con
 }
 
 //GetDetails method - allow you to receive detail information of specific transaction. You can include more than one of this command in single request.
+//
 //Detail-Request is used to get the detailed transaction information.
+//
 //Detail-Request only needs BATCHNUMBER of transactions that you want to see.
+//
 //Detail-Request can also use this parameter to search for specific transaction:
+//
 //ref, REF parameter used to search for specific fp_merchant_ref string that was saved by FasaPay during Transaction using SCI
+//
 //note, NOTE Parameter used to search for specific note string that was saved by FasaPay During Transaction.
-//basic xml format for simple detail request:
+//
+//Xml format for simple detail request:
+//
 //<fasa_request id="1234567">
 //    <auth>
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -298,7 +315,9 @@ func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx con
 //    </auth>
 //    <detail>TR2012092712345</detail>
 //</fasa_request>
-//basic xml format for simple detail request:
+//
+//Xml format for simple detail request:
+//
 //<fasa_request id="1234567">
 //    <auth><!-- authentication tag. required on every request -->
 //        <api_key>11123548cd3a5e5613325132112becf</api_key>
@@ -310,6 +329,7 @@ func (r *TransfersResource) GetHistory(history *GetHistoryRequestParams, ctx con
 //    <detail><ref>BL12345</ref></detail>
 //     <detail><note>Pembayaran</note></detail>
 //</fasa_request>
+//
 func (r *TransfersResource) GetDetails(details []GetDetailsDetailParamsInterface, ctx context.Context, attributes *RequestParamsAttributes) (*GetDetailsResponse, *http.Response, error) {
 	baseRequestParams := r.buildRequestParams(attributes)
 	requestParams := &GetDetailsRequest{baseRequestParams, details}
