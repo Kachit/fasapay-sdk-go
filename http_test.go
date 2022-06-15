@@ -98,7 +98,7 @@ func (suite *HttpTransportTestSuite) SetupTest() {
 func (suite *HttpTransportTestSuite) TestSendRequest() {
 	body, _ := LoadStubResponseData("stubs/accounts/balances/success.xml")
 
-	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri+"/foo", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri, httpmock.NewBytesResponder(http.StatusOK, body))
 
 	resp, err := suite.testable.SendRequest(suite.ctx, nil)
 	assert.NoError(suite.T(), err)
@@ -111,4 +111,8 @@ func (suite *HttpTransportTestSuite) TestSendRequest() {
 
 func (suite *HttpTransportTestSuite) TearDownTest() {
 	httpmock.DeactivateAndReset()
+}
+
+func TestHttpTransportTestSuite(t *testing.T) {
+	suite.Run(t, new(HttpTransportTestSuite))
 }
