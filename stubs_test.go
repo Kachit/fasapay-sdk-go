@@ -32,9 +32,9 @@ func BuildStubDateTime() time.Time {
 }
 
 //BuildStubRequest method
-func BuildStubRequest() *RequestParams {
+func BuildStubRequest() RequestParams {
 	auth := &RequestAuthParams{ApiKey: TestableApiKey, Token: TestableApiAuthToken}
-	return &RequestParams{Auth: auth, Id: "1234567"}
+	return RequestParams{Auth: auth, Id: "1234567"}
 }
 
 //LoadStubResponseData method

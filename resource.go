@@ -25,13 +25,12 @@ func (ra *ResourceAbstract) buildAuthRequestParams(dt time.Time) *RequestAuthPar
 }
 
 //BuildParams method
-func (ra *ResourceAbstract) buildRequestParams(attributes *RequestParamsAttributes) *RequestParams {
+func (ra *ResourceAbstract) buildRequestParams(attributes *RequestParamsAttributes) RequestParams {
 	if attributes == nil {
 		dt := time.Now().UTC()
 		attributes = &RequestParamsAttributes{Id: fmt.Sprint(dt.Unix()), DateTime: dt}
 	}
-	params := &RequestParams{Id: attributes.Id, Auth: ra.buildAuthRequestParams(attributes.DateTime)}
-	return params
+	return RequestParams{Id: attributes.Id, Auth: ra.buildAuthRequestParams(attributes.DateTime)}
 }
 
 //MarshalRequestParams method
@@ -58,6 +57,6 @@ func (ra *ResourceAbstract) unmarshalResponse(resp *http.Response, v interface{}
 }
 
 //NewResourceAbstract Create new resource abstract
-func NewResourceAbstract(transport *Transport, config *Config) *ResourceAbstract {
-	return &ResourceAbstract{tr: transport, cfg: config}
+func NewResourceAbstract(transport *Transport, config *Config) ResourceAbstract {
+	return ResourceAbstract{tr: transport, cfg: config}
 }

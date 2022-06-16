@@ -9,13 +9,13 @@ import (
 
 //GetBalancesRequest struct
 type GetBalancesRequest struct {
-	*RequestParams
+	RequestParams
 	Balances []CurrencyCode `xml:"balance" json:"balances"`
 }
 
 //GetBalancesResponse struct
 type GetBalancesResponse struct {
-	*ResponseBody
+	ResponseBody
 	Balances *GetBalancesResponseParams `xml:"balance,omitempty" json:"balances,omitempty"`
 }
 
@@ -27,13 +27,13 @@ type GetBalancesResponseParams struct {
 
 //GetAccountsRequest struct
 type GetAccountsRequest struct {
-	*RequestParams
+	RequestParams
 	Accounts []string `xml:"account" json:"accounts"`
 }
 
 //GetAccountsResponse struct
 type GetAccountsResponse struct {
-	*ResponseBody
+	ResponseBody
 	Accounts []*GetAccountsResponseParams `xml:"account,omitempty" json:"accounts,omitempty"`
 }
 
@@ -47,7 +47,7 @@ type GetAccountsResponseParams struct {
 
 //AccountsResource struct
 type AccountsResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //GetBalances method - allow you to check your FasaPay account balance.

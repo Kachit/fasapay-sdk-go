@@ -9,7 +9,7 @@ import (
 type ResourceAbstractTestSuite struct {
 	suite.Suite
 	cfg      *Config
-	testable *ResourceAbstract
+	testable ResourceAbstract
 }
 
 func (suite *ResourceAbstractTestSuite) SetupTest() {

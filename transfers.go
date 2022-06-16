@@ -34,13 +34,13 @@ func (ctr *CreateTransferRequestParams) isValid() error {
 
 //CreateTransferRequest struct
 type CreateTransferRequest struct {
-	*RequestParams
+	RequestParams
 	Transfers []*CreateTransferRequestParams `xml:"transfer" json:"transfers"`
 }
 
 //CreateTransferResponse struct
 type CreateTransferResponse struct {
-	*ResponseBody
+	ResponseBody
 	Transfers []*CreateTransferResponseParams `xml:"transfer,omitempty" json:"transfers,omitempty"`
 }
 
@@ -67,7 +67,7 @@ type CreateTransferResponseParams struct {
 
 //GetHistoryRequest struct
 type GetHistoryRequest struct {
-	*RequestParams
+	RequestParams
 	History *GetHistoryRequestParams `xml:"history" json:"history"`
 }
 
@@ -84,7 +84,7 @@ type GetHistoryRequestParams struct {
 
 //GetHistoryResponse struct
 type GetHistoryResponse struct {
-	*ResponseBody
+	ResponseBody
 	History *GetHistoryResponseHistoryParams `xml:"history" json:"history"`
 }
 
@@ -118,7 +118,7 @@ type GetHistoryResponseDetailParams struct {
 
 //GetDetailsRequest struct
 type GetDetailsRequest struct {
-	*RequestParams
+	RequestParams
 	Details []GetDetailsDetailParamsInterface `xml:"detail" json:"details"`
 }
 
@@ -149,7 +149,7 @@ func (f *GetDetailsRequestDetailParamsString) GetDetailType() string {
 
 //GetDetailsResponse struct
 type GetDetailsResponse struct {
-	*ResponseBody
+	ResponseBody
 	Details []*GetDetailsResponseDetailParams `xml:"detail,omitempty" json:"details,omitempty"`
 }
 
@@ -176,7 +176,7 @@ type GetDetailsResponseDetailParams struct {
 
 //TransfersResource struct
 type TransfersResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //CreateTransfer method - allow you to transfer fund from one account to another.
